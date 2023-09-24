@@ -150,12 +150,56 @@ const Tabs = () => {
                 }}
             />
             <Tab.Screen
+                name="Booking"
+                component={Home}
+                options={{
+                    tabBarIcon: ({ focused }) => (
+                        <Image
+                            source={icons.booking}
+                            resizeMode="contain"
+                            style={{
+                                width: 25,
+                                height: 25,
+                                tintColor: focused ? COLORS.white : COLORS.secondary
+                            }}
+                        />
+                    ),
+                    tabBarButton: (props) => (
+                        <TabBarCustomButton
+                            {...props}
+                        />
+                    )
+                }}
+            />
+            <Tab.Screen
                 name="Scan"
                 component={Scan}
                 options={{
                     tabBarIcon: ({ focused }) => (
                         <Image
                             source={icons.scan}
+                            resizeMode="contain"
+                            style={{
+                                width: 25,
+                                height: 25,
+                                tintColor: focused ? COLORS.white : COLORS.secondary
+                            }}
+                        />
+                    ),
+                    tabBarButton: (props) => (
+                        <TabBarCustomButton
+                            {...props}
+                        />
+                    )
+                }}
+            />
+            <Tab.Screen
+                name="History"
+                component={Home}
+                options={{
+                    tabBarIcon: ({ focused }) => (
+                        <Image
+                            source={icons.history}
                             resizeMode="contain"
                             style={{
                                 width: 25,
