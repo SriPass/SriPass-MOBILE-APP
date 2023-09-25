@@ -18,6 +18,8 @@ const user = require("../assets/icons/user.png");
 const wallet = require("../assets/icons/wallet.png");
 const history = require("../assets/icons/history.png");
 const booking = require("../assets/icons/booking.png");
+const calendar = require("../assets/icons/calendar.png");
+const clock = require("../assets/icons/clock.png");
 
 export default {
     back,
@@ -39,5 +41,7 @@ export default {
     user,
     wallet,
     history,
-    booking
+    booking,
+    calendar,
+    clock
 }
