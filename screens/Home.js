@@ -142,7 +142,7 @@ const Home = () => {
             <View style={{ flexDirection: 'row', marginVertical: SIZES.padding * 2 }}>
                 <View style={{ flex: 1 }}>
                     <Text style={{ ...FONTS.h1 }}>SriPass</Text>
-                    <Text style={{ ...FONTS.body2, color: COLORS.gray }}>Welcome, {userName || "{user.name}"}!</Text>
+                    <Text style={{ ...FONTS.body2, color: COLORS.gray }}>Welcome, {userName || "{user.name}"}</Text>
                     
                 </View>
 
