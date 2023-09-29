@@ -8,7 +8,7 @@
 
 import React from 'react';
 
-import { SignUp } from "./screens";
+import { Login } from "./screens";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -30,6 +30,8 @@ const App = () => {
         "Roboto-Bold" : require('./assets/fonts/Roboto-Bold.ttf'),
         "Roboto-Regular" : require('./assets/fonts/Roboto-Regular.ttf'),
     })
+
+    
     
     if(!loaded){
     return null;
@@ -40,9 +42,9 @@ const App = () => {
                 screenOptions={{
                     headerShown: false
                 }}
-                initialRouteName={'SignUp'}
+                initialRouteName={'Login'}
             >
-                <Stack.Screen name="SignUp" component={SignUp} />
+                <Stack.Screen name="Login" component={Login} />
 
                 {/* Tabs */}
                 <Stack.Screen name="HomeTabs" component={Tabs} />

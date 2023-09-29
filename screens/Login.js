@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
@@ -13,16 +13,54 @@ import {
     Platform
 } from "react-native"
 import { LinearGradient } from 'expo-linear-gradient'
-
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage from the correct package
 import { COLORS, SIZES, FONTS, icons, images } from "../constants"
 
-const SignUp = ({ navigation }) => {
+const Login = ({ navigation }) => {
 
     const [showPassword, setShowPassword] = React.useState(false)
 
     const [areas, setAreas] = React.useState([])
     const [selectedArea, setSelectedArea] = React.useState(null)
     const [modalVisible, setModalVisible] = React.useState(false)
+
+
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleLogin = async () => {
+        try {
+            const response = await fetch("https://sripass.onrender.com/api/localpassengers/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (response.ok) {
+                const user = await response.json();
+
+                // Save user session information (e.g., user email) in AsyncStorage or Redux
+                // You can use AsyncStorage for simplicity in this example
+                await AsyncStorage.setItem("userEmail", user.email);
+
+                // Navigate to the Home screen
+                navigation.navigate("HomeTabs");
+            } else {
+                // Handle authentication error (e.g., display an error message)
+                console.log("Authentication failed");
+            }
+        } catch (error) {
+            console.error("An error occurred:", error);
+        }
+    };
+
+
+
+
+
 
     React.useEffect(() => {
         fetch("https://restcountries.com/v3.1/all?fields=name,flags,cca3,idd")
@@ -37,7 +75,7 @@ const SignUp = ({ navigation }) => {
                     }
                 })
                 setAreas(areaData)
-                
+
                 if (areaData.length > 0) {
                     let defaultData = areaData.filter(a => a.code == "US")
 
@@ -47,6 +85,8 @@ const SignUp = ({ navigation }) => {
                 }
             })
     }, [])
+
+
 
     function renderHeader() {
         return (
@@ -59,7 +99,7 @@ const SignUp = ({ navigation }) => {
                 }}
                 onPress={() => console.log("Sign Up")}
             >
-                <Image
+                {/* <Image
                     source={icons.back}
                     resizeMode="contain"
                     style={{
@@ -67,9 +107,9 @@ const SignUp = ({ navigation }) => {
                         height: 20,
                         tintColor: COLORS.black
                     }}
-                />
+                /> */}
 
-                <Text style={{ marginLeft: SIZES.padding * 1.5, color: COLORS.black, ...FONTS.h4 }}>Sign Up</Text>
+                <Text style={{ marginLeft: SIZES.padding * 1.5, color: COLORS.black, ...FONTS.h4 }}>Login</Text>
             </TouchableOpacity>
         )
     }
@@ -103,84 +143,23 @@ const SignUp = ({ navigation }) => {
                     marginHorizontal: SIZES.padding * 3,
                 }}
             >
-                {/* Full Name */}
+                {/* Email */}
                 <View style={{ marginTop: SIZES.padding * 3 }}>
-                    <Text style={{ color: COLORS.black, ...FONTS.body3 }}>Full Name</Text>
+                    <Text style={{ color: COLORS.black, ...FONTS.body3 }}>Email</Text>
                     <TextInput
                         style={{
                             marginVertical: SIZES.padding,
                             borderBottomColor: COLORS.gray,
                             borderBottomWidth: 1,
                             height: 40,
-                            color: COLORS.white,
-                            ...FONTS.body3
+                            color: COLORS.black,
+                            ...FONTS.body3,
                         }}
-                        placeholder="Enter Full Name"
+                        placeholder="Enter Email"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
+                        onChangeText={(text) => setEmail(text)}
                     />
-                </View>
-
-                {/* Phone Number */}
-                <View style={{ marginTop: SIZES.padding * 2 }}>
-                    <Text style={{ color: COLORS.black, ...FONTS.body3 }}>Phone Number</Text>
-
-                    <View style={{ flexDirection: 'row' }}>
-                        {/* Country Code */}
-                        <TouchableOpacity
-                            style={{
-                                width: 100,
-                                height: 50,
-                                marginHorizontal: 5,
-                                borderBottomColor: COLORS.gray,
-                                borderBottomWidth: 1,
-                                flexDirection: 'row',
-                                ...FONTS.body2
-                            }}
-                            onPress={() => setModalVisible(true)}
-                        >
-                            <View style={{ justifyContent: 'center' }}>
-                                <Image
-                                    source={icons.down}
-                                    style={{
-                                        width: 10,
-                                        height: 10,
-                                        tintColor: COLORS.gray
-                                    }}
-                                />
-                            </View>
-                            <View style={{ justifyContent: 'center', marginLeft: 5 }}>
-                                <Image
-                                    source={{ uri: selectedArea?.flag }}
-                                    resizeMode="contain"
-                                    style={{
-                                        width: 30,
-                                        height: 30
-                                    }}
-                                />
-                            </View>
-
-                            <View style={{ justifyContent: 'center', marginLeft: 5 }}>
-                                <Text style={{ color: COLORS.white, ...FONTS.body3 }}>{selectedArea?.callingCode}</Text>
-                            </View>
-                        </TouchableOpacity>
-
-                        {/* Phone Number */}
-                        <TextInput
-                            style={{
-                                flex: 1,
-                                marginVertical: SIZES.padding,
-                                borderBottomColor: COLORS.gray,
-                                borderBottomWidth: 1,
-                                height: 40,
-                                color: COLORS.white,
-                                ...FONTS.body3
-                            }}
-                            placeholder="Enter Phone Number"
-                            placeholderTextColor={COLORS.gray}
-                            selectionColor={COLORS.gray}
-                        />
-                    </View>
                 </View>
 
                 {/* Password */}
@@ -192,21 +171,22 @@ const SignUp = ({ navigation }) => {
                             borderBottomColor: COLORS.gray,
                             borderBottomWidth: 1,
                             height: 40,
-                            color: COLORS.white,
-                            ...FONTS.body3
+                            color: COLORS.black,
+                            ...FONTS.body3,
                         }}
                         placeholder="Enter Password"
                         placeholderTextColor={COLORS.gray}
-                        selectionColor={COLORS.white}
+                        selectionColor={COLORS.black}
                         secureTextEntry={!showPassword}
+                        onChangeText={(text) => setPassword(text)}
                     />
                     <TouchableOpacity
                         style={{
-                            position: 'absolute',
+                            position: "absolute",
                             right: 0,
                             bottom: 10,
                             height: 30,
-                            width: 30
+                            width: 30,
                         }}
                         onPress={() => setShowPassword(!showPassword)}
                     >
@@ -215,13 +195,13 @@ const SignUp = ({ navigation }) => {
                             style={{
                                 height: 20,
                                 width: 20,
-                                tintColor: COLORS.gray
+                                tintColor: COLORS.gray,
                             }}
                         />
                     </TouchableOpacity>
                 </View>
             </View>
-        )
+        );
     }
 
     function renderButton() {
@@ -232,16 +212,17 @@ const SignUp = ({ navigation }) => {
                         height: 60,
                         backgroundColor: COLORS.lightblue,
                         borderRadius: SIZES.radius / 1.5,
-                        alignItems: 'center',
-                        justifyContent: 'center'
+                        alignItems: "center",
+                        justifyContent: "center",
                     }}
-                    onPress={() => navigation.navigate("HomeTabs")}
+                    onPress={handleLogin}
                 >
-                    <Text style={{ color: COLORS.white, ...FONTS.h3 }}>Register</Text>
+                    <Text style={{ color: COLORS.white, ...FONTS.h3 }}>Login</Text>
                 </TouchableOpacity>
             </View>
-        )
+        );
     }
+
 
     function renderAreaCodesModal() {
 
@@ -323,4 +304,4 @@ const SignUp = ({ navigation }) => {
     )
 }
 
-export default SignUp;
+export default Login;

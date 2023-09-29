@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     SafeAreaView,
     View,
@@ -8,8 +8,27 @@ import {
     TouchableOpacity
 } from "react-native"
 import { COLORS, SIZES, FONTS, icons, images } from "../constants"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Home = () => {
+
+    const [userEmail, setUserEmail] = useState("");
+
+  useEffect(() => {
+    // Fetch the user's email from AsyncStorage when the component mounts
+    const fetchUserEmail = async () => {
+      try {
+        const email = await AsyncStorage.getItem("userEmail");
+        if (email) {
+          setUserEmail(email);
+        }
+      } catch (error) {
+        console.error("Error fetching user email:", error);
+      }
+    };
+
+    fetchUserEmail();
+  }, []);
 
     const featuresData = [
         {
@@ -99,6 +118,7 @@ const Home = () => {
 
     const [features, setFeatures] = React.useState(featuresData)
     const [specialPromos, setSpecialPromos] = React.useState(specialPromoData)
+    
 
     function renderHeader() {
         return (
@@ -106,6 +126,7 @@ const Home = () => {
                 <View style={{ flex: 1 }}>
                     <Text style={{ ...FONTS.h1 }}>SriPass</Text>
                     <Text style={{ ...FONTS.body2, color: COLORS.gray }}>Ticketing App</Text>
+                    <Text>Welcome, {userEmail || "Guest"}</Text>
                 </View>
 
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>

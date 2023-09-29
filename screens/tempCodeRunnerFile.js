@@ -16,7 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 
 import { COLORS, SIZES, FONTS, icons, images } from "../constants"
 
-const SignUp = ({ navigation }) => {
+const Login = ({ navigation }) => {
 
     const [showPassword, setShowPassword] = React.useState(false)
 
@@ -59,7 +59,7 @@ const SignUp = ({ navigation }) => {
                 }}
                 onPress={() => console.log("Sign Up")}
             >
-                <Image
+                {/* <Image
                     source={icons.back}
                     resizeMode="contain"
                     style={{
@@ -67,9 +67,9 @@ const SignUp = ({ navigation }) => {
                         height: 20,
                         tintColor: COLORS.black
                     }}
-                />
+                /> */}
 
-                <Text style={{ marginLeft: SIZES.padding * 1.5, color: COLORS.black, ...FONTS.h4 }}>Sign Up</Text>
+                <Text style={{ marginLeft: SIZES.padding * 1.5, color: COLORS.black, ...FONTS.h4 }}>Login</Text>
             </TouchableOpacity>
         )
     }
@@ -105,83 +105,23 @@ const SignUp = ({ navigation }) => {
             >
                 {/* Full Name */}
                 <View style={{ marginTop: SIZES.padding * 3 }}>
-                    <Text style={{ color: COLORS.black, ...FONTS.body3 }}>Full Name</Text>
+                    <Text style={{ color: COLORS.black, ...FONTS.body3 }}>Email</Text>
                     <TextInput
                         style={{
                             marginVertical: SIZES.padding,
                             borderBottomColor: COLORS.gray,
                             borderBottomWidth: 1,
                             height: 40,
-                            color: COLORS.white,
+                            color: COLORS.black,
                             ...FONTS.body3
                         }}
-                        placeholder="Enter Full Name"
+                        placeholder="Enter Email"
                         placeholderTextColor={COLORS.gray}
-                        selectionColor={COLORS.white}
+                        selectionColor={COLORS.black}
                     />
                 </View>
 
-                {/* Phone Number */}
-                <View style={{ marginTop: SIZES.padding * 2 }}>
-                    <Text style={{ color: COLORS.black, ...FONTS.body3 }}>Phone Number</Text>
-
-                    <View style={{ flexDirection: 'row' }}>
-                        {/* Country Code */}
-                        <TouchableOpacity
-                            style={{
-                                width: 100,
-                                height: 50,
-                                marginHorizontal: 5,
-                                borderBottomColor: COLORS.gray,
-                                borderBottomWidth: 1,
-                                flexDirection: 'row',
-                                ...FONTS.body2
-                            }}
-                            onPress={() => setModalVisible(true)}
-                        >
-                            <View style={{ justifyContent: 'center' }}>
-                                <Image
-                                    source={icons.down}
-                                    style={{
-                                        width: 10,
-                                        height: 10,
-                                        tintColor: COLORS.gray
-                                    }}
-                                />
-                            </View>
-                            <View style={{ justifyContent: 'center', marginLeft: 5 }}>
-                                <Image
-                                    source={{ uri: selectedArea?.flag }}
-                                    resizeMode="contain"
-                                    style={{
-                                        width: 30,
-                                        height: 30
-                                    }}
-                                />
-                            </View>
-
-                            <View style={{ justifyContent: 'center', marginLeft: 5 }}>
-                                <Text style={{ color: COLORS.white, ...FONTS.body3 }}>{selectedArea?.callingCode}</Text>
-                            </View>
-                        </TouchableOpacity>
-
-                        {/* Phone Number */}
-                        <TextInput
-                            style={{
-                                flex: 1,
-                                marginVertical: SIZES.padding,
-                                borderBottomColor: COLORS.gray,
-                                borderBottomWidth: 1,
-                                height: 40,
-                                color: COLORS.white,
-                                ...FONTS.body3
-                            }}
-                            placeholder="Enter Phone Number"
-                            placeholderTextColor={COLORS.gray}
-                            selectionColor={COLORS.gray}
-                        />
-                    </View>
-                </View>
+                
 
                 {/* Password */}
                 <View style={{ marginTop: SIZES.padding * 2 }}>
@@ -192,12 +132,12 @@ const SignUp = ({ navigation }) => {
                             borderBottomColor: COLORS.gray,
                             borderBottomWidth: 1,
                             height: 40,
-                            color: COLORS.white,
+                            color: COLORS.black,
                             ...FONTS.body3
                         }}
                         placeholder="Enter Password"
                         placeholderTextColor={COLORS.gray}
-                        selectionColor={COLORS.white}
+                        selectionColor={COLORS.black}
                         secureTextEntry={!showPassword}
                     />
                     <TouchableOpacity
@@ -237,7 +177,7 @@ const SignUp = ({ navigation }) => {
                     }}
                     onPress={() => navigation.navigate("HomeTabs")}
                 >
-                    <Text style={{ color: COLORS.white, ...FONTS.h3 }}>Register</Text>
+                    <Text style={{ color: COLORS.white, ...FONTS.h3 }}>Login</Text>
                 </TouchableOpacity>
             </View>
         )
@@ -323,4 +263,4 @@ const SignUp = ({ navigation }) => {
     )
 }
 
-export default SignUp;
+export default Login;
