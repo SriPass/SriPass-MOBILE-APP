@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const Home = () => {
 
     const [userEmail, setUserEmail] = useState("");
+    const [userName, setUserName] = useState("");
 
   useEffect(() => {
     // Fetch the user's email from AsyncStorage when the component mounts
@@ -28,6 +29,22 @@ const Home = () => {
     };
 
     fetchUserEmail();
+  }, []);
+
+  useEffect(() => {
+    // Fetch the user's name from AsyncStorage when the component mounts
+    const fetchUserName = async () => {
+      try {
+        const name = await AsyncStorage.getItem("userName");
+        if (name) {
+          setUserName(name);
+        }
+      } catch (error) {
+        console.error("Error fetching user name:", error);
+      }
+    };
+
+    fetchUserName();
   }, []);
 
     const featuresData = [
@@ -125,8 +142,8 @@ const Home = () => {
             <View style={{ flexDirection: 'row', marginVertical: SIZES.padding * 2 }}>
                 <View style={{ flex: 1 }}>
                     <Text style={{ ...FONTS.h1 }}>SriPass</Text>
-                    <Text style={{ ...FONTS.body2, color: COLORS.gray }}>Ticketing App</Text>
-                    <Text>Welcome, {userEmail || "Guest"}</Text>
+                    <Text style={{ ...FONTS.body2, color: COLORS.gray }}>Welcome, {userName || "{user.name}"}!</Text>
+                    
                 </View>
 
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>

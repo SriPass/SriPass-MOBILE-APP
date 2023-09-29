@@ -23,8 +23,14 @@ const Login = ({ navigation }) => {
     const [areas, setAreas] = React.useState([])
     const [selectedArea, setSelectedArea] = React.useState(null)
     const [modalVisible, setModalVisible] = React.useState(false)
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
-
+    const showSuccessPopup = () => {
+        setShowSuccessMessage(true);
+        // You can also navigate to the Home screen here if needed
+        // navigation.navigate("HomeTabs");
+    };
+    
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -45,9 +51,10 @@ const Login = ({ navigation }) => {
                 // Save user session information (e.g., user email) in AsyncStorage or Redux
                 // You can use AsyncStorage for simplicity in this example
                 await AsyncStorage.setItem("userEmail", user.email);
-
+                await AsyncStorage.setItem("userName", user.name);
                 // Navigate to the Home screen
                 navigation.navigate("HomeTabs");
+                showSuccessPopup();
             } else {
                 // Handle authentication error (e.g., display an error message)
                 console.log("Authentication failed");
@@ -58,7 +65,10 @@ const Login = ({ navigation }) => {
     };
 
 
-
+    const hideSuccessPopup = () => {
+        setShowSuccessMessage(false);
+    };
+    
 
 
 
@@ -86,7 +96,43 @@ const Login = ({ navigation }) => {
             })
     }, [])
 
-
+    function renderSuccessPopup() {
+        return (
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={showSuccessMessage}
+                onRequestClose={hideSuccessPopup}
+            >
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                    <View
+                        style={{
+                            height: 200,
+                            width: 300,
+                            backgroundColor: COLORS.lightGreen,
+                            borderRadius: SIZES.radius,
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        <Text style={{ ...FONTS.h3 }}>Login Successful!</Text>
+                        <TouchableOpacity
+                            style={{
+                                marginTop: SIZES.padding * 2,
+                                padding: SIZES.padding,
+                                backgroundColor: COLORS.lightblue,
+                                borderRadius: SIZES.radius / 1.5,
+                            }}
+                            onPress={hideSuccessPopup}
+                        >
+                            <Text style={{ color: COLORS.white, ...FONTS.h3 }}>OK</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        );
+    }
+    
 
     function renderHeader() {
         return (
@@ -300,6 +346,7 @@ const Login = ({ navigation }) => {
                 </ScrollView>
             </LinearGradient>
             {renderAreaCodesModal()}
+            {renderSuccessPopup()}
         </KeyboardAvoidingView>
     )
 }
