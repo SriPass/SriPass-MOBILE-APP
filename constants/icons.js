@@ -20,6 +20,7 @@ const history = require("../assets/icons/history.png");
 const booking = require("../assets/icons/booking.png");
 const calendar = require("../assets/icons/calendar.png");
 const clock = require("../assets/icons/clock.png");
+const qr = require("../assets/icons/qr.png");
 
 export default {
     back,
@@ -43,5 +44,6 @@ export default {
     history,
     booking,
     calendar,
-    clock
+    clock,
+    qr
 }
