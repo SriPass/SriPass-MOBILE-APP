@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import RNPickerSelect from 'react-native-picker-select';
 import {
     View,
     Text,
@@ -15,7 +16,12 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { COLORS, SIZES, FONTS, icons, images } from "../constants";
 
-const Booking = ({ navigation }) => {
+const Booking = ({ navigation ,route  }) => {
+
+
+
+    const scannedData = route.params?.scannedData || "";
+
     const [areas, setAreas] = useState([]);
     const [selectedArea, setSelectedArea] = useState(null);
     const [isDatePickerVisible, setDatePickerVisible] = useState(false);
@@ -23,6 +29,69 @@ const Booking = ({ navigation }) => {
     const [isTimePickerVisible, setTimePickerVisible] = useState(false);
     const [selectedTime, setSelectedTime] = useState(null);
 
+    const [routeNumbers, setRouteNumbers] = useState([]);
+    const [selectedRoute, setSelectedRoute] = useState('');
+
+    const [destinations, setDestinations] = useState([]);
+    const [selectedDestination, setSelectedDestination] = useState('');
+    const [fare, setFare] = useState('');
+
+
+
+    useEffect(() => {
+        if (selectedRoute) {
+            // Make a request to your server to fetch destinations for the selected RouteNo
+            fetch(`https://sripass.onrender.com/api/busroutes/destinations/${selectedRoute}`)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    if (data.length > 0) {
+                        const destinationOptions = data.map((item) => ({
+                            label: `${item.startPoint} - ${item.endPoint}`,
+                            value: `${item.startPoint} - ${item.endPoint}`,
+                            fare: item.fare, // Include the fare in the destination options
+                        }));
+                        setDestinations(destinationOptions);
+
+                        // Set the fare and selectedDestination if there's a selected destination
+                        if (selectedDestination) {
+                            const selectedFare = destinationOptions.find((option) => option.value === selectedDestination)?.fare;
+                            setFare(selectedFare ? selectedFare.toString() : "");
+                        }
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching destinations:', error);
+                });
+        }
+    }, [selectedRoute, selectedDestination]); // Include selectedDestination as a dependency
+
+
+
+    useEffect(() => {
+        fetch('https://sripass.onrender.com/api/busroutes/')
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (data.length > 0) {
+                    // Assuming each data item has a "RouteNo" field
+                    const routeNumbers = data.map((item) => item.RouteNo);
+                    setRouteNumbers(routeNumbers);
+                    setSelectedRoute(routeNumbers[0]);
+                }
+            })
+            .catch((error) => {
+                console.error('Error fetching route numbers:', error);
+            });
+    }, []);
 
 
     useEffect(() => {
@@ -104,12 +173,78 @@ const Booking = ({ navigation }) => {
         return (
             <View
                 style={{
-                    marginTop: SIZES.padding * 3,
+                    marginTop: SIZES.padding * 2,
                     marginHorizontal: SIZES.padding * 3,
                 }}
             >
-                {/* Route */}
+                {/* Route Dropdown */}
+                <TouchableOpacity
+                    onPress={() => navigation.navigate("Scan")}
+                    style={{
+                        marginTop: SIZES.padding * 3,
+                        height: 55,
+                        backgroundColor: COLORS.lightGray,
+                        borderRadius: 10,
+                        borderColor: COLORS.gray,
+                        borderWidth: 1,
+                        paddingLeft: 10,
+                        paddingRight: 40,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                    }}
+                >
+                    <Text style={{ ...FONTS.body3, color: COLORS.black }}>
+                         {scannedData ? `${scannedData}` : "Scan Qr"}
+                    </Text>
+                    <Image
+                        source={icons.qr}
+                        style={{
+                            width: 20,
+                            height: 20,
+                            tintColor: COLORS.gray,
+                        }}
+                    />
+                </TouchableOpacity>
+
+
+
+                {/* Destination Dropdown */}
                 <View style={{ marginTop: SIZES.padding * 3 }}>
+                    <RNPickerSelect
+                        items={destinations}
+                        onValueChange={(value) => setSelectedDestination(value)}
+                        value={selectedDestination}
+                        placeholder={{ label: "Select Destination", value: null }}
+                        style={{
+                            inputIOS: {
+                                height: 55,
+                                backgroundColor: COLORS.lightGray,
+                                color: COLORS.black,
+                                borderRadius: 10,
+                                borderColor: COLORS.gray,
+                                borderWidth: 1,
+                                paddingLeft: 10,
+                                paddingRight: 40,
+                                ...FONTS.body3,
+                            },
+                            inputAndroid: {
+                                height: 55,
+                                backgroundColor: COLORS.lightGray,
+                                color: COLORS.black,
+                                borderRadius: 10,
+                                borderColor: COLORS.gray,
+                                borderWidth: 1,
+                                paddingLeft: 10,
+                                paddingRight: 40,
+                                ...FONTS.body3,
+                            },
+                        }}
+                    />
+                </View>
+
+                {/* Price */}
+                <View style={{ marginTop: SIZES.padding * 2 }}>
                     <TextInput
                         style={{
                             marginVertical: SIZES.padding,
@@ -123,11 +258,15 @@ const Booking = ({ navigation }) => {
                             paddingRight: 10,
                             ...FONTS.body3,
                         }}
-                        placeholder="Route"
+                        placeholder="Price"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
+                        value={`LKR ${fare}`} // Add the "$" symbol before the 'fare' value
+                        onChangeText={(value) => setFare(value)} // Add this to handle changes to the Price TextInput
                     />
                 </View>
+
+
 
                 {/* Date */}
                 <View style={{ marginTop: SIZES.padding * 1, flexDirection: "row", alignItems: "center" }}>
@@ -199,47 +338,7 @@ const Booking = ({ navigation }) => {
                 </View>
 
 
-                {/* No of Seats */}
-                <View style={{ marginTop: SIZES.padding * 1 }}>
-                    <TextInput
-                        style={{
-                            marginVertical: SIZES.padding,
-                            borderRadius: 10,
-                            borderColor: COLORS.gray,
-                            borderWidth: 1,
-                            height: 55,
-                            backgroundColor: COLORS.lightGray,
-                            color: COLORS.black,
-                            paddingLeft: 10,
-                            paddingRight: 10,
-                            ...FONTS.body3,
-                        }}
-                        placeholder="No of Seats"
-                        placeholderTextColor={COLORS.gray}
-                        selectionColor={COLORS.white}
-                    />
-                </View>
 
-                {/* Price */}
-                <View style={{ marginTop: SIZES.padding * 1 }}>
-                    <TextInput
-                        style={{
-                            marginVertical: SIZES.padding,
-                            borderRadius: 10,
-                            borderColor: COLORS.gray,
-                            borderWidth: 1,
-                            height: 55,
-                            backgroundColor: COLORS.lightGray,
-                            color: COLORS.black,
-                            paddingLeft: 10,
-                            paddingRight: 10,
-                            ...FONTS.body3,
-                        }}
-                        placeholder="Price"
-                        placeholderTextColor={COLORS.gray}
-                        selectionColor={COLORS.white}
-                    />
-                </View>
             </View>
         );
     };
