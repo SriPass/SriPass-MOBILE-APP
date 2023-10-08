@@ -3,6 +3,9 @@ import { View, Text, Image, TouchableOpacity, Modal } from "react-native";
 import { Camera } from 'expo-camera';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { COLORS, FONTS, SIZES, icons, images } from "../constants";
+import { Audio } from 'expo-av';
+
+
 
 const Scan = ({ navigation }) => {
   const [hasPermission, setHasPermission] = useState(null);
@@ -17,32 +20,103 @@ const Scan = ({ navigation }) => {
     })();
   }, []);
 
-  function onBarCodeRead(result) {
+  const playScanSound = async () => {
+    const { sound } = await Audio.Sound.createAsync(
+      require('../assets/sounds/qr_audio.mp3') // Replace with the path to your audio file
+    );
+
+    await sound.playAsync();
+  };
+
+
+  const onBarCodeRead = (result) => {
     if (!scanned) {
       setScanned(true);
       console.log(result.data);
-      toggleModal(result.data);
-      navigation.navigate('Booking', { scannedData: result.data });
+      playScanSound();
+      setTimeout(() => {
+        navigation.navigate('Booking', { scannedData: result.data });
+        // Reset the scanned state after navigating
+        setScanned(false);
+      }, 1000);
     }
-  }
+  };
+
+
 
   const toggleModal = (data = "") => {
     setScannedData(data);
     setIsModalVisible(!isModalVisible);
   };
 
-  const renderHeader = () => {
+  function renderHeader() {
     return (
-      <View>
-        {/* Your header UI components */}
+      <View style={{ flexDirection: 'row', marginTop: SIZES.padding * 4, paddingHorizontal: SIZES.padding * 3 }}>
+        <TouchableOpacity
+          style={{
+            width: 45,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onPress={() => navigation.navigate("Home")}
+        >
+          <Image
+            source={icons.close}
+            style={{
+              height: 20,
+              width: 20,
+              tintColor: COLORS.white
+            }}
+          />
+        </TouchableOpacity>
+
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: COLORS.white, ...FONTS.body3 }}>Scan for Route</Text>
+        </View>
+
+        <TouchableOpacity
+          style={{
+            height: 45,
+            width: 45,
+            backgroundColor: COLORS.lightblue,
+            borderRadius: 10,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onPress={() => console.log("Info")}
+        >
+          <Image
+            source={icons.info}
+            style={{
+              height: 25,
+              width: 25,
+              tintColor: COLORS.white
+            }}
+          />
+        </TouchableOpacity>
       </View>
-    );
+    )
   }
+
 
   const renderScanFocus = () => {
     return (
-      <View>
-        {/* Your scan focus UI components */}
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <Image
+          source={images.focus}
+          resizeMode="stretch"
+          style={{
+            marginTop: "-55%",
+            width: 200,
+            height: 200
+          }}
+        />
       </View>
     );
   }
@@ -55,27 +129,6 @@ const Scan = ({ navigation }) => {
     );
   }
 
-  const renderModal = () => {
-    return (
-        <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => {
-          toggleModal();
-        }}
-      >
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <View style={{ backgroundColor: "white", padding: 20, borderRadius: 10 }}>
-            <Text style={{ fontSize: 20 }}>Route No: {scannedData}</Text>
-           
-            
-          </View>
-        </View>
-      </Modal>
-      
-    );
-  };
 
   if (hasPermission === null) {
     return <View />;
@@ -94,7 +147,6 @@ const Scan = ({ navigation }) => {
         {renderScanFocus()}
         {renderPaymentMethods()}
       </BarCodeScanner>
-      {renderModal()}
     </View>
   );
 };

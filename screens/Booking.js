@@ -16,7 +16,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { COLORS, SIZES, FONTS, icons, images } from "../constants";
 
-const Booking = ({ navigation ,route  }) => {
+const Booking = ({ navigation, route }) => {
 
 
 
@@ -39,9 +39,9 @@ const Booking = ({ navigation ,route  }) => {
 
 
     useEffect(() => {
-        if (selectedRoute) {
+        if (scannedData) {
             // Make a request to your server to fetch destinations for the selected RouteNo
-            fetch(`https://sripass.onrender.com/api/busroutes/destinations/${selectedRoute}`)
+            fetch(`https://sripass.onrender.com/api/busroutes/destinations/${scannedData}`)
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -53,7 +53,7 @@ const Booking = ({ navigation ,route  }) => {
                         const destinationOptions = data.map((item) => ({
                             label: `${item.startPoint} - ${item.endPoint}`,
                             value: `${item.startPoint} - ${item.endPoint}`,
-                            fare: item.fare, // Include the fare in the destination options
+                            fare: `LKR ${item.fare}` // Include the fare in the destination options
                         }));
                         setDestinations(destinationOptions);
 
@@ -68,7 +68,7 @@ const Booking = ({ navigation ,route  }) => {
                     console.error('Error fetching destinations:', error);
                 });
         }
-    }, [selectedRoute, selectedDestination]); // Include selectedDestination as a dependency
+    }, [scannedData, selectedDestination]); // Include selectedDestination as a dependency
 
 
 
@@ -178,8 +178,7 @@ const Booking = ({ navigation ,route  }) => {
                 }}
             >
                 {/* Route Dropdown */}
-                <TouchableOpacity
-                    onPress={() => navigation.navigate("Scan")}
+                <View
                     style={{
                         marginTop: SIZES.padding * 3,
                         height: 55,
@@ -194,18 +193,21 @@ const Booking = ({ navigation ,route  }) => {
                         justifyContent: "space-between",
                     }}
                 >
-                    <Text style={{ ...FONTS.body3, color: COLORS.black }}>
-                         {scannedData ? `${scannedData}` : "Scan Qr"}
+                    <Text style={{ ...FONTS.body3, color: scannedData ? COLORS.black : COLORS.gray }}>
+                        {scannedData ? `Route ${scannedData}` : "Please Scan QR"}
                     </Text>
-                    <Image
-                        source={icons.qr}
-                        style={{
-                            width: 20,
-                            height: 20,
-                            tintColor: COLORS.gray,
-                        }}
-                    />
-                </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => navigation.navigate("Scan")} style={{ position: "absolute", right: 10 }}>
+                        <Image
+                            source={icons.qr}
+                            style={{
+                                width: 20,
+                                height: 20,
+                                tintColor: COLORS.gray,
+                            }}
+                        />
+                    </TouchableOpacity>
+                </View>
 
 
 
@@ -261,7 +263,8 @@ const Booking = ({ navigation ,route  }) => {
                         placeholder="Price"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
-                        value={`LKR ${fare}`} // Add the "$" symbol before the 'fare' value
+                        value={fare}
+                        editable={false}
                         onChangeText={(value) => setFare(value)} // Add this to handle changes to the Price TextInput
                     />
                 </View>
