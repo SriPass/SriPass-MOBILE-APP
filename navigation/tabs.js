@@ -15,6 +15,7 @@ import { Home, Scan } from "../screens"
 import { COLORS, icons } from "../constants"
 import Booking from "../screens/Booking";
 import Profile from "../screens/Profile";
+import History from "../screens/History";
 
 const Tab = createBottomTabNavigator()
 
@@ -197,7 +198,7 @@ const Tabs = () => {
             />
             <Tab.Screen
                 name="History"
-                component={Home}
+                component={History}
                 options={{
                     tabBarIcon: ({ focused }) => (
                         <Image

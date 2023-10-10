@@ -38,7 +38,7 @@ const Scan = ({ navigation }) => {
         navigation.navigate('Booking', { scannedData: result.data });
         // Reset the scanned state after navigating
         setScanned(false);
-      }, 1000);
+      }, 500);
     }
   };
 
