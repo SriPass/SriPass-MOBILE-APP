@@ -47,6 +47,7 @@ const Login = ({ navigation }) => {
                 // You can use AsyncStorage for simplicity in this example
                 await AsyncStorage.setItem("userEmail", user.email);
                 await AsyncStorage.setItem("userName", user.name);
+                await AsyncStorage.setItem("passengerId", user.passengerId);
                 // Navigate to the Home screen
                 navigation.navigate("HomeTabs");
             } else {
