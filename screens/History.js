@@ -79,15 +79,7 @@ const History = ({ navigation }) => {
   };
 
   const renderForm = () => {
-    // Check if historyData is defined and not empty
-    if (!historyData || historyData.length === 0) {
-      return (
-        <View style={{ marginTop: SIZES.padding * 3 }}>
-          <Text style={{ color: COLORS.black }}>No history data available.</Text>
-        </View>
-      );
-    }
-
+    
     return (
       <View style={{ marginTop: SIZES.padding * 5, marginHorizontal: SIZES.padding * 3 }}>
         {historyData.map((item, index) => (
