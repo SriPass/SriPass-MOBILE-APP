@@ -89,21 +89,36 @@ const History = ({ navigation }) => {
     }
 
     return (
-      <View
-        style={{
-          marginTop: SIZES.padding * 3,
-          marginHorizontal: SIZES.padding * 3,
-        }}
-      >
+      <View style={{ marginTop: SIZES.padding * 5, marginHorizontal: SIZES.padding * 3 }}>
         {historyData.map((item, index) => (
           <View key={index}>
-            <Text style={{ color: COLORS.black }}>RouteNo: {item.RouteNo}</Text>
-            <Text style={{ color: COLORS.black }}>Cost: {item.cost}</Text>
+            {/* Display route and createdAt in the same row */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ color: COLORS.black, fontSize: 18, fontWeight: 'bold', paddingBottom: 5 }}>{item.journey}</Text>
+              <Text style={{ color: COLORS.gray, fontSize: 16, paddingBottom: 2 }}>{item.createdAt.split('T')[0]}</Text>
+            </View>
+            
+            <Text style={{ color: COLORS.black, fontSize: 16, paddingBottom: 2 }}>Duration: {item.duration} min</Text>
+            <Text style={{ color: COLORS.black, fontSize: 16, paddingBottom: 2 }}>Distance: {item.distance} Km</Text>
+            <Text style={{ color: COLORS.black, fontSize: 16 }}>Cost: LKR {item.cost}</Text>
+    
+            {index !== historyData.length - 1 && ( // Add a divider if not the last item
+              <View
+                style={{
+                  height: 1,
+                  backgroundColor: COLORS.gray,
+                  marginVertical: SIZES.padding,
+                }}
+              />
+            )}
           </View>
         ))}
       </View>
     );
+    
+    
   };
+
 
   return (
     <KeyboardAvoidingView
