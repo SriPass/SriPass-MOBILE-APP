@@ -28,7 +28,7 @@ const Booking = ({ navigation, route }) => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [isTimePickerVisible, setTimePickerVisible] = useState(false);
     const [selectedTime, setSelectedTime] = useState(null);
-
+    const [priceInput, setPriceInput] = useState('');
     const [routeNumbers, setRouteNumbers] = useState([]);
     const [selectedRoute, setSelectedRoute] = useState('');
 
@@ -53,7 +53,7 @@ const Booking = ({ navigation, route }) => {
                         const destinationOptions = data.map((item) => ({
                             label: `${item.startPoint} - ${item.endPoint}`,
                             value: `${item.startPoint} - ${item.endPoint}`,
-                            fare: `LKR ${item.fare}` // Include the fare in the destination options
+                            fare: item.fare // Include the fare in the destination options
                         }));
                         setDestinations(destinationOptions);
 
@@ -176,7 +176,9 @@ const Booking = ({ navigation, route }) => {
                     marginTop: SIZES.padding * 2,
                     marginHorizontal: SIZES.padding * 3,
                 }}
+
             >
+
                 {/* Route Dropdown */}
                 <View
                     style={{
@@ -263,9 +265,10 @@ const Booking = ({ navigation, route }) => {
                         placeholder="Price"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
-                        value={fare}
+                        value={`LKR ${fare}`}
                         editable={false}
                         onChangeText={(value) => setFare(value)} // Add this to handle changes to the Price TextInput
+
                     />
                 </View>
 
@@ -347,8 +350,8 @@ const Booking = ({ navigation, route }) => {
     };
 
     const renderButton = () => {
-        const isFormIncomplete = !selectedDestination || !selectedDate || !selectedTime;
-    
+        const isFormIncomplete = !selectedDestination || !selectedDate || !selectedTime || !fare;
+
         return (
             <View style={{ margin: SIZES.padding * 3 }}>
                 <TouchableOpacity
@@ -359,7 +362,12 @@ const Booking = ({ navigation, route }) => {
                         alignItems: "center",
                         justifyContent: "center",
                     }}
-                    onPress={() => navigation.navigate("Payment")}
+                    onPress={() => {
+                        if (!isFormIncomplete) {
+                            // Pass the 'fare' as a parameter to the Payment page
+                            navigation.navigate("Payment", { fare });
+                        }
+                    }}
                     disabled={isFormIncomplete}
                 >
                     <Text style={{ color: isFormIncomplete ? COLORS.white : COLORS.white, ...FONTS.h3 }}>
@@ -369,7 +377,8 @@ const Booking = ({ navigation, route }) => {
             </View>
         );
     };
-    
+
+
 
 
     return (

@@ -10,49 +10,73 @@ import {
     ScrollView,
     Platform,
 } from "react-native";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { COLORS, SIZES, FONTS, icons, images } from "../constants";
 
-function isVisaCardNumberValid(cardNumber) {
-    // Remove spaces and non-digit characters
-    const cleanedCardNumber = cardNumber.replace(/\D/g, '');
 
-    // Check if the card number is 16 digits
-    return cleanedCardNumber.length === 16;
-}
 
-const Payment = ({ navigation }) => {
+const Payment = ({ navigation, route }) => {
+    const { fare } = route.params;
+
     const [areas, setAreas] = useState([]);
     const [selectedArea, setSelectedArea] = useState(null);
     const [isDatePickerVisible, setDatePickerVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
+    const [objectId, setObjectId] = useState("");
+    const [userData, setUserData] = useState({});
+    const [errorMessage, setErrorMessage] = useState("");
+    const [isConfirmButtonDisabled, setIsConfirmButtonDisabled] = useState(false);
 
-    const [cardNumber, setCardNumber] = useState('');
-    const [isCardNumberValid, setCardNumberValid] = useState(true);
+    useEffect(() => {
+        // Fetch the user's email from AsyncStorage when the component mounts
+        const fetchObjectId = async () => {
+            try {
+                const id = await AsyncStorage.getItem("objectId");
+                if (id) {
+                    setObjectId(id);
+                }
+            } catch (error) {
+                console.error("Error fetching user objectId:", error);
+            }
+        };
 
-    const handleCardNumberChange = (text) => {
-        setCardNumber(text);
-        // Check and update card number validation
-        setCardNumberValid(isVisaCardNumberValid(text));
-    };
+        fetchObjectId();
+    }, []);
 
-    const [cvv, setCvv] = useState('');
-    const [isCvvValid, setCvvValid] = useState(true);
+    useEffect(() => {
+        // Disable the button when userData is still loading
+        if (userData === undefined || userData.balance === undefined) {
+            setIsConfirmButtonDisabled(true);
+        } else {
+            setIsConfirmButtonDisabled(false);
+        }
+    }, [userData]);
 
-    const handleCvvChange = (text) => {
-        setCvv(text);
-        // Check and update CVV validation
-        setCvvValid(text.length === 3);
-    };
 
-    const [cardType, setCardType] = useState('Credit'); // Initial card type
+    useEffect(() => {
+        // Fetch user data based on the objectId using another useEffect
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch(`https://sripass.onrender.com/api/localpassengers/${objectId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    // Update the userData state with the fetched data
+                    setUserData(data);
+                } else {
+                    console.error("Failed to fetch user data");
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
 
-    const handleCardTypeChange = (type) => {
-        setCardType(type);
-    };
+        if (objectId) {
+            fetchUserData();
+        }
+    }, [objectId]);
 
     const showDatePicker = () => {
         setDatePickerVisible(true);
@@ -64,7 +88,16 @@ const Payment = ({ navigation }) => {
         setDatePickerVisible(false);
     };
 
-    const isButtonEnabled = isCardNumberValid && isCvvValid && selectedDate;
+    const handlePayment = () => {
+        if (userData && userData.balance !== undefined && userData.balance >= fare) {
+            // Sufficient balance, proceed with payment logic here
+            // ...
+        } else {
+            setErrorMessage("Insufficient balance");
+            setIsConfirmButtonDisabled(true);
+        }
+    };
+
 
     return (
         <KeyboardAvoidingView
@@ -80,7 +113,7 @@ const Payment = ({ navigation }) => {
                             marginTop: SIZES.padding * 6,
                             paddingHorizontal: SIZES.padding * 2,
                         }}
-                        onPress={() => navigation.navigate("Home")}
+                        onPress={() => navigation.navigate("Booking")}
                     >
                         <Image
                             source={icons.back}
@@ -101,140 +134,96 @@ const Payment = ({ navigation }) => {
                             marginHorizontal: SIZES.padding * 3,
                         }}
                     >
-                        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                            <TouchableOpacity
-                                style={{ marginRight: 10 }}
-                                onPress={() => handleCardTypeChange('Credit')}
+                        <View style={{ alignItems: "center", paddingBottom: 5 }}>
+                            <Text
+                                style={{
+                                    ...FONTS.h6,
+                                    fontSize: 15,
+                                    color: COLORS.black,
+                                }}
                             >
-                                <Text style={{ color: cardType === 'Credit' ? COLORS.primary : COLORS.black, fontSize: 18 }}>
-                                    Credit
-                                </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => handleCardTypeChange('Debit')}>
-                                <Text style={{ color: cardType === 'Debit' ? COLORS.primary : COLORS.black, fontSize: 18 }}>
-                                    Debit
-                                </Text>
-                            </TouchableOpacity>
+                                Payment
+                            </Text>
                         </View>
-                        <View style={{ marginTop: SIZES.padding * 2 }}>
-                            <TextInput
+                        <View style={{ alignItems: "center" }}>
+                            <Text
                                 style={{
-                                    marginVertical: SIZES.padding,
-                                    borderRadius: 10,
-                                    borderColor: COLORS.gray,
-                                    borderWidth: 1,
-                                    height: 55,
-                                    backgroundColor: COLORS.lightGray,
-                                    color: COLORS.black,
-                                    paddingLeft: 10,
-                                    paddingRight: 10,
-                                    ...FONTS.body3,
+                                    ...FONTS.h5,
+                                    fontSize: 50,
+                                    fontWeight: 'bold',
+                                    color: COLORS.primary,
                                 }}
-                                placeholder="Card Number"
-                                placeholderTextColor={COLORS.gray}
-                                selectionColor={COLORS.white}
-                                onChangeText={handleCardNumberChange}
-                                value={cardNumber}
-                                keyboardType="number-pad"
-                                maxLength={16}
-                            />
-                            {!isCardNumberValid && (
-                                <Text style={{ color: 'red' }}>Invalid card number</Text>
-                            )}
+                            >
+                                LKR {fare}
+                            </Text>
                         </View>
-                        <View style={{ marginTop: SIZES.padding * 2 }}>
-                            <TextInput
-                                style={{
-                                    marginVertical: SIZES.padding,
-                                    borderRadius: 10,
-                                    borderColor: COLORS.gray,
-                                    borderWidth: 1,
-                                    height: 55,
-                                    backgroundColor: COLORS.lightGray,
-                                    color: COLORS.black,
-                                    paddingLeft: 10,
-                                    paddingRight: 10,
-                                    ...FONTS.body3,
-                                }}
-                                placeholder="CVV"
-                                placeholderTextColor={COLORS.gray}
-                                selectionColor={COLORS.white}
-                                onChangeText={handleCvvChange}
-                                value={cvv}
-                                keyboardType="number-pad"
-                                maxLength={3}
-                            />
-                            {!isCvvValid && (
-                                <Text style={{ color: 'red' }}>Invalid CVV</Text>
-                            )}
-                        </View>
-                        <View style={{ marginTop: SIZES.padding * 2, flexDirection: "row", alignItems: "center" }}>
-                            <TextInput
-                                style={{
-                                    flex: 1,
-                                    marginVertical: SIZES.padding,
-                                    borderRadius: 10,
-                                    borderColor: COLORS.gray,
-                                    borderWidth: 1,
-                                    height: 55,
-                                    backgroundColor: COLORS.lightGray,
-                                    color: COLORS.black,
-                                    paddingLeft: 10,
-                                    paddingRight: 40,
-                                    ...FONTS.body3,
-                                }}
-                                placeholder="Expiry Date"
-                                placeholderTextColor={COLORS.gray}
-                                selectionColor={COLORS.white}
-                                value={selectedDate}
-                                onTouchStart={showDatePicker}
-                            />
-                            <TouchableOpacity onPress={showDatePicker} style={{ position: "absolute", right: 10 }}>
-                                <Image
-                                    source={icons.calendar}
-                                    style={{
-                                        width: 20,
-                                        height: 20,
-                                        tintColor: COLORS.gray,
-                                    }}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                        <View style={{ marginTop: SIZES.padding * 2 }}>
-                            <TextInput
-                                style={{
-                                    marginVertical: SIZES.padding,
-                                    borderRadius: 10,
-                                    borderColor: COLORS.gray,
-                                    borderWidth: 1,
-                                    height: 55,
-                                    backgroundColor: COLORS.lightGray,
-                                    color: COLORS.black,
-                                    paddingLeft: 10,
-                                    paddingRight: 10,
-                                    ...FONTS.body3,
-                                }}
-                                placeholder="Price"
-                                placeholderTextColor={COLORS.gray}
-                                selectionColor={COLORS.white}
-                                editable={false}
-                            />
-                        </View>
+
                     </View>
+
+                    <View style={{ marginTop: SIZES.padding * 5, marginHorizontal: SIZES.padding * 3 }}>
+                        <View
+                            style={{
+                                height: 1,
+                                backgroundColor: COLORS.gray,
+                                marginVertical: SIZES.padding,
+                            }}
+                        />
+
+                        {/* Display route and createdAt in the same row */}
+                        <View style={{ marginTop: SIZES.padding * 2, flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ color: COLORS.black, fontSize: 18, fontWeight: 'bold', paddingBottom: 6 }}>Wallet Balance</Text>
+                            <Text style={{ color: COLORS.black, fontSize: 16, paddingBottom: 2 }}>LKR {userData.balance}</Text>
+                        </View>
+
+                        <View style={{ marginTop: SIZES.padding * 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ color: COLORS.black, fontSize: 16,  }}>Route</Text>
+                            <Text style={{ color: COLORS.darkgray, fontSize: 16,  }}>Panadura to Pettah</Text>
+                        </View>
+
+                        <View style={{ marginTop: SIZES.padding * 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ color: COLORS.black, fontSize: 16 }}>Route No</Text>
+                            <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>101</Text>
+                        </View>
+
+                        <View style={{ marginTop: SIZES.padding * 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ color: COLORS.black, fontSize: 16 }}>Date</Text>
+                            <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>2023-09-28</Text>
+                        </View>
+
+                        <View style={{ marginTop: SIZES.padding * 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ color: COLORS.black, fontSize: 16 }}>Time</Text>
+                            <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>11:19 PM</Text>
+                        </View>
+
+                        <View style={{ marginTop: SIZES.padding * 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ color: COLORS.black, fontSize: 16 }}>Cost</Text>
+                            <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>LKR 75</Text>
+                        </View>
+
+                        
+
+                    </View>
+                    <View style={{ marginTop: SIZES.padding * 15, alignItems: 'center' }}>
+                            {errorMessage && (
+                                <Text style={{ color: COLORS.red, ...FONTS.body3 }}>{errorMessage}</Text>
+                            )}
+                        </View>
                     <View style={{ margin: SIZES.padding * 3 }}>
                         <TouchableOpacity
                             style={{
                                 height: 60,
-                                backgroundColor: isButtonEnabled ? COLORS.lightblue : COLORS.gray,
+                                backgroundColor: isConfirmButtonDisabled ? COLORS.gray : COLORS.lightblue,
                                 borderRadius: SIZES.radius / 1.5,
                                 alignItems: "center",
                                 justifyContent: "center",
                             }}
-                            onPress={() => navigation.navigate("HomeTabs")}
-                            disabled={!isButtonEnabled}
+                            disabled={isConfirmButtonDisabled}
+                            onPress={handlePayment}
                         >
                             <Text style={{ color: COLORS.white, ...FONTS.h3 }}>Confirm Payment</Text>
                         </TouchableOpacity>
+                       
+
                     </View>
                 </ScrollView>
             </LinearGradient>
