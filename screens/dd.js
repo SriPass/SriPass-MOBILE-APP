@@ -14,29 +14,25 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
-import { COLORS, SIZES, FONTS, icons, images } from "../constants";
+import { COLORS, SIZES, FONTS, icons } from "../constants";
 
 const Booking = ({ navigation, route }) => {
-
-
-
     const scannedData = route.params?.scannedData || "";
 
-    const [areas, setAreas] = useState([]);
-    const [selectedArea, setSelectedArea] = useState(null);
-    const [isDatePickerVisible, setDatePickerVisible] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [isTimePickerVisible, setTimePickerVisible] = useState(false);
-    const [selectedTime, setSelectedTime] = useState(null);
+    const [selectedRoute, setSelectedRoute] = useState("");
+    const [selectedDestination, setSelectedDestination] = useState("");
+    const [selectedDate, setSelectedDate] = useState("");
+    const [selectedTime, setSelectedTime] = useState("");
 
-    const [routeNumbers, setRouteNumbers] = useState([]);
-    const [selectedRoute, setSelectedRoute] = useState('');
+    const [isRouteValid, setRouteValid] = useState(false);
+    const [isDestinationValid, setDestinationValid] = useState(false);
+    const [isDateValid, setDateValid] = useState(false);
+    const [isTimeValid, setTimeValid] = useState(false);
+
+    const isButtonEnabled = isRouteValid && isDestinationValid && isDateValid && isTimeValid;
 
     const [destinations, setDestinations] = useState([]);
-    const [selectedDestination, setSelectedDestination] = useState('');
-    const [fare, setFare] = useState('');
-
-
+    const [fare, setFare] = useState("");
 
     useEffect(() => {
         if (scannedData) {
@@ -53,11 +49,10 @@ const Booking = ({ navigation, route }) => {
                         const destinationOptions = data.map((item) => ({
                             label: `${item.startPoint} - ${item.endPoint}`,
                             value: `${item.startPoint} - ${item.endPoint}`,
-                            fare: `LKR ${item.fare}` // Include the fare in the destination options
+                            fare: `LKR ${item.fare}`
                         }));
                         setDestinations(destinationOptions);
 
-                        // Set the fare and selectedDestination if there's a selected destination
                         if (selectedDestination) {
                             const selectedFare = destinationOptions.find((option) => option.value === selectedDestination)?.fare;
                             setFare(selectedFare ? selectedFare.toString() : "");
@@ -68,79 +63,42 @@ const Booking = ({ navigation, route }) => {
                     console.error('Error fetching destinations:', error);
                 });
         }
-    }, [scannedData, selectedDestination]); // Include selectedDestination as a dependency
-
-
-
-    useEffect(() => {
-        fetch('https://sripass.onrender.com/api/busroutes/')
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then((data) => {
-                if (data.length > 0) {
-                    // Assuming each data item has a "RouteNo" field
-                    const routeNumbers = data.map((item) => item.RouteNo);
-                    setRouteNumbers(routeNumbers);
-                    setSelectedRoute(routeNumbers[0]);
-                }
-            })
-            .catch((error) => {
-                console.error('Error fetching route numbers:', error);
-            });
-    }, []);
-
-
-    useEffect(() => {
-        fetch("https://restcountries.com/v3.1/all?fields=name,flags,cca3,idd")
-            .then((response) => response.json())
-            .then((data) => {
-                let areaData = data.map((item) => {
-                    return {
-                        code: item.cca3,
-                        name: item.name?.common,
-                        flag: item.flags.png,
-                        callingCode: item.idd?.root + item.idd?.suffixes[0],
-                    };
-                });
-                setAreas(areaData);
-
-                if (areaData.length > 0) {
-                    let defaultData = areaData.filter((a) => a.code == "US");
-
-                    if (defaultData.length > 0) {
-                        setSelectedArea(defaultData[0]);
-                    }
-                }
-            });
-    }, []);
+    }, [scannedData, selectedDestination]);
 
     const showDatePicker = () => {
         setDatePickerVisible(true);
     };
+
     const showTimePicker = () => {
         setTimePickerVisible(true);
     };
-
 
     const handleDateConfirm = (date) => {
         const formattedDate = date.toISOString().split("T")[0];
         setSelectedDate(formattedDate);
         setDatePickerVisible(false);
+        setDateValid(true); // Date is valid
     };
 
     const handleTimeConfirm = (time) => {
-        // Format the selected time as needed
         const formattedTime = time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-        // Update the selected time state and hide the time picker
         setSelectedTime(formattedTime);
         setTimePickerVisible(false);
+        setTimeValid(true); // Time is valid
     };
 
+    const handleRouteChange = (value) => {
+        setSelectedRoute(value);
+        setRouteValid(!!value); // Validate that a route is selected
+    };
+
+    const handleDestinationChange = (value) => {
+        setSelectedDestination(value);
+        setDestinationValid(!!value); // Validate that a destination is selected
+
+        const selectedFare = destinations.find((option) => option.value === value)?.fare;
+        setFare(selectedFare ? selectedFare.toString() : "");
+    };
 
     const renderHeader = () => {
         return (
@@ -177,7 +135,6 @@ const Booking = ({ navigation, route }) => {
                     marginHorizontal: SIZES.padding * 3,
                 }}
             >
-                {/* Route Dropdown */}
                 <View
                     style={{
                         marginTop: SIZES.padding * 3,
@@ -196,7 +153,6 @@ const Booking = ({ navigation, route }) => {
                     <Text style={{ ...FONTS.body3, color: scannedData ? COLORS.black : COLORS.gray }}>
                         {scannedData ? `Route ${scannedData}` : "Please Scan QR"}
                     </Text>
-
                     <TouchableOpacity onPress={() => navigation.navigate("Scan")} style={{ position: "absolute", right: 10 }}>
                         <Image
                             source={icons.qr}
@@ -209,11 +165,8 @@ const Booking = ({ navigation, route }) => {
                     </TouchableOpacity>
                 </View>
 
-
-
-                {/* Destination Dropdown */}
                 <View style={{ marginTop: SIZES.padding * 3 }}>
-                    <RNPickerSelect
+                <RNPickerSelect
                         items={destinations}
                         onValueChange={(value) => setSelectedDestination(value)}
                         value={selectedDestination}
@@ -243,9 +196,11 @@ const Booking = ({ navigation, route }) => {
                             },
                         }}
                     />
+                    {!isDestinationValid && (
+                        <Text style={{ color: 'red' }}>Please select a destination</Text>
+                    )}
                 </View>
 
-                {/* Price */}
                 <View style={{ marginTop: SIZES.padding * 2 }}>
                     <TextInput
                         style={{
@@ -265,13 +220,9 @@ const Booking = ({ navigation, route }) => {
                         selectionColor={COLORS.white}
                         value={fare}
                         editable={false}
-                        onChangeText={(value) => setFare(value)} // Add this to handle changes to the Price TextInput
                     />
                 </View>
 
-
-
-                {/* Date */}
                 <View style={{ marginTop: SIZES.padding * 1, flexDirection: "row", alignItems: "center" }}>
                     <TextInput
                         style={{
@@ -284,14 +235,14 @@ const Booking = ({ navigation, route }) => {
                             backgroundColor: COLORS.lightGray,
                             color: COLORS.black,
                             paddingLeft: 10,
-                            paddingRight: 40, // Adjust the paddingRight to make space for the icon
+                            paddingRight: 40,
                             ...FONTS.body3,
                         }}
                         placeholder="Date"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
-                        value={selectedDate} // Display the selected date here
-                        onTouchStart={showDatePicker} // Open the date picker on press
+                        value={selectedDate}
+                        onTouchStart={showDatePicker}
                     />
                     <TouchableOpacity onPress={showDatePicker} style={{ position: "absolute", right: 10 }}>
                         <Image
@@ -305,8 +256,6 @@ const Booking = ({ navigation, route }) => {
                     </TouchableOpacity>
                 </View>
 
-
-                {/* Time */}
                 <View style={{ marginTop: SIZES.padding * 1, flexDirection: "row", alignItems: "center" }}>
                     <TextInput
                         style={{
@@ -319,14 +268,14 @@ const Booking = ({ navigation, route }) => {
                             backgroundColor: COLORS.lightGray,
                             color: COLORS.black,
                             paddingLeft: 10,
-                            paddingRight: 40, // Adjust the paddingRight to make space for the icon
+                            paddingRight: 40,
                             ...FONTS.body3,
                         }}
                         placeholder="Time"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
-                        value={selectedTime} // Display the selected time here
-                        onTouchStart={showTimePicker} // Open the time picker on press
+                        value={selectedTime}
+                        onTouchStart={showTimePicker}
                     />
                     <TouchableOpacity onPress={showTimePicker} style={{ position: "absolute", right: 10 }}>
                         <Image
@@ -339,38 +288,29 @@ const Booking = ({ navigation, route }) => {
                         />
                     </TouchableOpacity>
                 </View>
-
-
-
             </View>
         );
     };
 
     const renderButton = () => {
-        const isFormIncomplete = !selectedDestination || !selectedDate || !selectedTime;
-    
         return (
             <View style={{ margin: SIZES.padding * 3 }}>
                 <TouchableOpacity
                     style={{
                         height: 60,
-                        backgroundColor: isFormIncomplete ? COLORS.gray : COLORS.lightblue,
+                        backgroundColor: isButtonEnabled ? COLORS.lightblue : COLORS.gray,
                         borderRadius: SIZES.radius / 1.5,
                         alignItems: "center",
                         justifyContent: "center",
                     }}
                     onPress={() => navigation.navigate("Payment")}
-                    disabled={isFormIncomplete}
+                    disabled={!isButtonEnabled}
                 >
-                    <Text style={{ color: isFormIncomplete ? COLORS.white : COLORS.white, ...FONTS.h3 }}>
-                        Book Now
-                    </Text>
+                    <Text style={{ color: COLORS.white, ...FONTS.h3 }}>Book Now</Text>
                 </TouchableOpacity>
             </View>
         );
     };
-    
-
 
     return (
         <KeyboardAvoidingView
@@ -398,7 +338,6 @@ const Booking = ({ navigation, route }) => {
                 onCancel={() => setTimePickerVisible(false)}
             />
         </KeyboardAvoidingView>
-
     );
 };
 

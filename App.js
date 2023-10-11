@@ -13,6 +13,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import Tabs from "./navigation/tabs";
+import Payment from './screens/Payment';
 
 const theme = {
     ...DefaultTheme,
@@ -43,6 +44,7 @@ const App = () => {
                 initialRouteName={'Login'}
             >
                 <Stack.Screen name="Login" component={Login} />
+                <Stack.Screen name="Payment" component={Payment} />
 
                 {/* Tabs */}
                 <Stack.Screen name="HomeTabs" component={Tabs} />
