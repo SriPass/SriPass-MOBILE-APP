@@ -28,7 +28,7 @@ const Profile = ({ navigation }) => {
     const [userData, setUserData] = useState({});
 
     useEffect(() => {
-        // Fetch the user's email from AsyncStorage when the component mounts
+        
         const fetchObjectId = async () => {
             try {
                 const id = await AsyncStorage.getItem("objectId");
