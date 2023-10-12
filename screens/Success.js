@@ -11,13 +11,12 @@ import {
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COLORS, SIZES, FONTS, icons, images } from "../constants";
 
-const Success = ({ navigation }) => {
-    
+const Success = ({ navigation, route }) => {
 
+    const scannedData = route.params?.scannedData || "";
+    const reference = route.params?.reference || "";
 
     const renderHeader = () => {
         return (
@@ -28,7 +27,7 @@ const Success = ({ navigation }) => {
                     marginTop: SIZES.padding * 6,
                     paddingHorizontal: SIZES.padding * 2,
                 }}
-                onPress={() => navigation.navigate("Home")}
+
             >
                 <Image
                     source={icons.back}
@@ -40,7 +39,7 @@ const Success = ({ navigation }) => {
                     }}
                 />
                 <Text style={{ marginLeft: SIZES.padding * 1.5, color: COLORS.black, ...FONTS.h4 }}>
-                    Profile
+                    Success
                 </Text>
             </TouchableOpacity>
         );
@@ -50,18 +49,52 @@ const Success = ({ navigation }) => {
         return (
             <View
                 style={{
-                    marginTop: SIZES.padding * 3,
-                    marginHorizontal: SIZES.padding * 3,
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
                 }}
             >
-               
+                <Image
+                    source={images.check}
+                    style={{
+                        width: 100,
+                        height: 100,
+                        marginTop: 200, // Add a 20 unit margin at the top
+                    }}
+                />
+                <Text style={{ color: COLORS.lightblue, fontSize: 25, fontWeight: 'bold',marginTop: 20,marginBottom: 20, }}>
+                    Transfer Successful!
+                </Text>
 
-
+                <Text style={{ color: COLORS.gray, fontSize: 16 }}>Transaction Reference </Text>
+                <Text style={{ color: COLORS.black, fontSize: 12 ,marginTop: 4}}>{reference}</Text>
             </View>
+
         );
     };
 
-    
+    const renderButton = () => {
+        return (
+            <View style={{ margin: SIZES.padding * 3, marginTop: SIZES.padding * 20 }}>
+                <TouchableOpacity
+                    style={{
+                        height: 60,
+                        backgroundColor: COLORS.lightblue,
+                        borderRadius: SIZES.radius / 1.5,
+                        alignItems: "center",
+                        justifyContent: "center",
+                    }}
+                    onPress={() => {
+                        // Here, navigate to the "Login" screen
+                        navigation.navigate("Booking", { scannedData });
+
+                    }}
+                >
+                    <Text style={{ color: COLORS.white, ...FONTS.h3 }}>OK</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    };
 
 
 
@@ -74,10 +107,9 @@ const Success = ({ navigation }) => {
                 <ScrollView>
                     {renderHeader()}
                     {renderForm()}
-                    
+                    {renderButton()}
                 </ScrollView>
             </LinearGradient>
-            
         </KeyboardAvoidingView>
 
     );
