@@ -5,9 +5,6 @@ const focus = require("../assets/images/focus.png");
 const avatar = require("../assets/images/avatar.png");
 const check = require("../assets/images/check.png");
 
-// Dummy
-const usFlag = require("../assets/images/us-flag.jpg");
-
 
 export default {
     sripassLogo,
@@ -16,6 +13,5 @@ export default {
     focus,
     avatar,
     check,
-    // Dummy
-    usFlag
+    
 }
