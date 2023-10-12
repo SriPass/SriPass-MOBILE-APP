@@ -28,7 +28,7 @@ const Profile = ({ navigation }) => {
     const [userData, setUserData] = useState({});
 
     useEffect(() => {
-        
+
         const fetchObjectId = async () => {
             try {
                 const id = await AsyncStorage.getItem("objectId");
@@ -125,32 +125,36 @@ const Profile = ({ navigation }) => {
                     marginHorizontal: SIZES.padding * 3,
                 }}
             >
-                {/* Email */}
+                {/* Display user data or loading text for the Name */}
                 <View style={{
                     marginTop: SIZES.padding * 3,
                     flexDirection: 'row',
                     alignItems: 'center',
-                    justifyContent: 'space-between', // Add this line
+                    justifyContent: 'space-between',
                 }}>
                     <Text style={{
                         ...FONTS.h2,
                         color: COLORS.black,
                         marginRight: 10
                     }}>
-                        {`${userData.firstName} ${userData.lastName}`}
+                        {userData && Object.keys(userData).length > 0
+                            ? `${userData.firstName} ${userData.lastName}`
+                            : "Loading..."}
                     </Text>
-                    <Image
-                        source={images.avatar}
-                        style={{
-                            width: 80,
-                            height: 80,
-                            
-                        }}
-                    />
+                    {userData && Object.keys(userData).length > 0 ? (
+                        <Image
+                            source={images.avatar}
+                            style={{
+                                width: 80,
+                                height: 80,
+                            }}
+                        />
+                    ) : null}
                 </View>
 
-                {/* Username */}
-                <View style={{ marginTop: SIZES.padding * 4 }}>
+
+                {/* Display user data or loading text for the Email */}
+                <View style={{ marginTop: SIZES.padding * 5 }}>
                     <TextInput
                         style={{
                             marginVertical: SIZES.padding,
@@ -167,13 +171,14 @@ const Profile = ({ navigation }) => {
                         placeholder="Username"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
-                        value={userData.email}
+                        value={userData && Object.keys(userData).length > 0
+                            ? userData.email
+                            : "Loading..."}
                         editable={false}
-
                     />
                 </View>
 
-                {/* Username */}
+                {/* Display user data or loading text for the Username */}
                 <View style={{ marginTop: SIZES.padding * 1 }}>
                     <TextInput
                         style={{
@@ -191,13 +196,14 @@ const Profile = ({ navigation }) => {
                         placeholder="Username"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
-                        value={`${userData.firstName}_${userData.lastName}`.toLowerCase()}
+                        value={userData && Object.keys(userData).length > 0
+                            ? `${userData.firstName}_${userData.lastName}`.toLowerCase()
+                            : "Loading..."}
                         editable={false}
-
                     />
                 </View>
 
-                {/* Password */}
+                {/* Display user data or loading text for the Password */}
                 <View style={{ marginTop: SIZES.padding * 1 }}>
                     <TextInput
                         style={{
@@ -215,32 +221,34 @@ const Profile = ({ navigation }) => {
                         placeholder="Password"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
-                        value={userData.password}
+                        value={userData && Object.keys(userData).length > 0
+                            ? userData.password
+                            : "Loading..."}
                         secureTextEntry={!showPassword}
                         editable={false}
                     />
-                    <TouchableOpacity
-                        style={{
-                            position: "absolute",
-                            right: 0,
-                            bottom: 15,
-                            height: 30,
-                            width: 30,
-                        }}
-                        onPress={() => setShowPassword(!showPassword)}
-                    >
-                        <Image
-                            source={showPassword ? icons.disable_eye : icons.eye}
+                    {userData && Object.keys(userData).length > 0 ? (
+                        <TouchableOpacity
                             style={{
-                                height: 20,
-                                width: 20,
-                                tintColor: COLORS.gray,
+                                position: "absolute",
+                                right: 0,
+                                bottom: 15,
+                                height: 30,
+                                width: 30,
                             }}
-                        />
-                    </TouchableOpacity>
+                            onPress={() => setShowPassword(!showPassword)}
+                        >
+                            <Image
+                                source={showPassword ? icons.disable_eye : icons.eye}
+                                style={{
+                                    height: 20,
+                                    width: 20,
+                                    tintColor: COLORS.gray,
+                                }}
+                            />
+                        </TouchableOpacity>
+                    ) : null}
                 </View>
-
-
             </View>
         );
     };

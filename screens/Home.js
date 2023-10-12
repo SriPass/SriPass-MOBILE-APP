@@ -16,7 +16,7 @@ const Home = () => {
     const [userName, setUserName] = useState("");
 
     const [objectId, setObjectId] = useState("");
-    
+
 
     useEffect(() => {
         // Fetch the user's email from AsyncStorage when the component mounts
@@ -49,11 +49,11 @@ const Home = () => {
 
         fetchUserName();
     }, []);
-    
+
     const [userData, setUserData] = useState({});
 
     useEffect(() => {
-        
+
         const fetchObjectId = async () => {
             try {
                 const id = await AsyncStorage.getItem("objectId");
@@ -162,35 +162,40 @@ const Home = () => {
 
         const Header = () => (
             <View style={{ marginBottom: SIZES.padding * 2, marginTop: SIZES.padding * 2 }}>
-              <Text style={{ ...FONTS.h3,marginBottom: SIZES.padding * 2 }}>Wallet Balance</Text>
-          
-              <View
-                style={{
-                  alignItems: 'center',
-                  backgroundColor: COLORS.white,
-                  borderRadius: 20,
-                  padding: SIZES.padding * 4,
-                  shadowColor: COLORS.black,
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 3,
-                  elevation: 4, // This is for Android shadow
-                }}
-              >
-                <Text
-                  style={{
-                    ...FONTS.h5,
-                    fontSize: 50,
-                    color: COLORS.black,
-                    fontWeight: 'bold',
-                  }}
+                <Text style={{ ...FONTS.h3, marginBottom: SIZES.padding * 2 }}>Wallet Balance</Text>
+
+                <View
+                    style={{
+                        alignItems: 'center',
+                        backgroundColor: COLORS.white,
+                        borderRadius: 20,
+                        padding: SIZES.padding * 4,
+                        shadowColor: COLORS.black,
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 3,
+                        elevation: 4, // This is for Android shadow
+                    }}
                 >
-                  LKR {userData.balance}
-                </Text>
-              </View>
+                    {userData.balance === undefined ? (
+                        <Text style={{ color: COLORS.black, ...FONTS.h3 }}>Loading...</Text>
+                    ) : (
+                        <Text
+                            style={{
+                                ...FONTS.h5,
+                                fontSize: 50,
+                                color: COLORS.black,
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            LKR {userData.balance}
+                        </Text>
+                    )}
+                </View>
             </View>
-          );
-          
+        );
+
+
 
 
 

@@ -75,7 +75,7 @@ const Success = ({ navigation, route }) => {
 
     const renderButton = () => {
         return (
-            <View style={{ margin: SIZES.padding * 3, marginTop: SIZES.padding * 20 }}>
+            <View style={{ margin: SIZES.padding * 3, marginTop: SIZES.padding * 25 }}>
                 <TouchableOpacity
                     style={{
                         height: 60,
