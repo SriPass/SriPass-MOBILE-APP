@@ -35,9 +35,9 @@ const Booking = ({ navigation, route }) => {
     const [selectedDestination, setSelectedDestination] = useState('');
     const [fare, setFare] = useState('');
     const [passengerId, setPassengerId] = useState("");
-     
+
     useEffect(() => {
-        
+
         const fetchPassengerId = async () => {
             try {
                 const id = await AsyncStorage.getItem("passengerId");
@@ -257,12 +257,11 @@ const Booking = ({ navigation, route }) => {
                         placeholder="Price"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
-                        value={`LKR ${fare}`}
-                        editable={false}
-                        onChangeText={(value) => setFare(value)} // Add this to handle changes to the Price TextInput
-
+                        value={fare ? `LKR ${fare}` : ''} // Display "LKR" before the price if fare is available
+                        editable={false} // Make the input non-editable
                     />
                 </View>
+
 
 
 
@@ -357,7 +356,7 @@ const Booking = ({ navigation, route }) => {
                     onPress={() => {
                         if (!isFormIncomplete) {
                             // Pass the 'fare' as a parameter to the Payment page
-                            navigation.navigate("Payment", { fare , scannedData , selectedDestination , selectedDate ,selectedTime , passengerId });
+                            navigation.navigate("Payment", { fare, scannedData, selectedDestination, selectedDate, selectedTime, passengerId });
                         }
                     }}
                     disabled={isFormIncomplete}

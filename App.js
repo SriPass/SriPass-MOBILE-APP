@@ -14,6 +14,7 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import Tabs from "./navigation/tabs";
 import Payment from './screens/Payment';
+import Success from './screens/Success';
 
 const theme = {
     ...DefaultTheme,
@@ -45,6 +46,7 @@ const App = () => {
             >
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name="Payment" component={Payment} />
+                <Stack.Screen name="Success" component={Success} />
 
                 {/* Tabs */}
                 <Stack.Screen name="HomeTabs" component={Tabs} />

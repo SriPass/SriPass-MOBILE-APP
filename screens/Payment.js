@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { COLORS, SIZES, FONTS, icons, images } from "../constants";
 
@@ -22,7 +21,7 @@ const Payment = ({ navigation, route }) => {
 
     const { fare, scannedData, selectedDestination, selectedDate, selectedTime, passengerId } = route.params;
 
-   
+
     const [objectId, setObjectId] = useState("");
     const [userData, setUserData] = useState({});
     const [errorMessage, setErrorMessage] = useState("");
@@ -76,31 +75,33 @@ const Payment = ({ navigation, route }) => {
         }
     }, [objectId]);
 
+    const reference = '#REF' + objectId.substring(0, 5) + selectedDate.replace(/-/g, '');
+
     const updateCost = async () => {
         try {
-          const newCost = userData.balance - fare;
-          const response = await fetch(`https://sripass.onrender.com/api/localpassengers/${objectId}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              balance: newCost,
-            }),
-          });
-      
-          if (response.ok) {
-            // The cost field has been successfully updated
-            console.log("Cost updated successfully");
-            // You might want to update the userData state with the new cost here if necessary
-            setUserData({ ...userData, cost: newCost });
-          } else {
-            console.error("Failed to update cost");
-          }
+            const newCost = userData.balance - fare;
+            const response = await fetch(`https://sripass.onrender.com/api/localpassengers/${objectId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    balance: newCost,
+                }),
+            });
+
+            if (response.ok) {
+                // The cost field has been successfully updated
+                console.log("Cost updated successfully");
+                // You might want to update the userData state with the new cost here if necessary
+                setUserData({ ...userData, cost: newCost });
+            } else {
+                console.error("Failed to update cost");
+            }
         } catch (error) {
-          console.error("Error updating cost:", error);
+            console.error("Error updating cost:", error);
         }
-      };
+    };
 
     const saveTravelHistory = async () => {
         try {
@@ -121,7 +122,7 @@ const Payment = ({ navigation, route }) => {
 
             if (response.ok) {
                 // Data was successfully saved, navigate to the "Book" page
-                navigation.navigate('Booking', { scannedData });
+                navigation.navigate('Success', { reference, scannedData });
             } else {
                 console.error("Failed to save travel history");
             }
@@ -219,7 +220,10 @@ const Payment = ({ navigation, route }) => {
                         {/* Display route and createdAt in the same row */}
                         <View style={{ marginTop: SIZES.padding * 2, flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text style={{ color: COLORS.black, fontSize: 18, fontWeight: 'bold', paddingBottom: 6 }}>Wallet Balance</Text>
-                            <Text style={{ color: COLORS.black, fontSize: 16, paddingBottom: 2 }}>LKR {userData.balance}</Text>
+                            <Text style={{ color: COLORS.black, fontSize: 16, paddingBottom: 2 }}>
+                                {userData.balance !== undefined ? `LKR ${userData.balance}` : 'Loading...'}
+                            </Text>
+
                         </View>
 
                         <View style={{ marginTop: SIZES.padding * 1, flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -247,10 +251,15 @@ const Payment = ({ navigation, route }) => {
                             <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>LKR {fare}</Text>
                         </View>
 
+                        <View style={{ marginTop: SIZES.padding * 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ color: COLORS.black, fontSize: 16 }}>Reference</Text>
+                            <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>{reference}</Text>
+                        </View>
+
 
 
                     </View>
-                    
+
                     <View style={{ marginTop: SIZES.padding * 10, margin: SIZES.padding * 3 }}>
                         <TouchableOpacity
                             style={{
@@ -266,10 +275,10 @@ const Payment = ({ navigation, route }) => {
                             <Text style={{ color: COLORS.white, ...FONTS.h3 }}>Confirm Payment</Text>
                         </TouchableOpacity>
                         <View style={{ marginTop: SIZES.padding * 2, alignItems: 'center' }}>
-                        {errorMessage && (
-                            <Text style={{ color: COLORS.red, ...FONTS.body3 }}>{errorMessage}</Text>
-                        )}
-                    </View>
+                            {errorMessage && (
+                                <Text style={{ color: COLORS.red, ...FONTS.body3 }}>{errorMessage}</Text>
+                            )}
+                        </View>
 
                     </View>
                 </ScrollView>
