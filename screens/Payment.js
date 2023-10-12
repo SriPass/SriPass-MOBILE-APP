@@ -19,12 +19,10 @@ import { COLORS, SIZES, FONTS, icons, images } from "../constants";
 
 
 const Payment = ({ navigation, route }) => {
-    const { fare } = route.params;
 
-    const [areas, setAreas] = useState([]);
-    const [selectedArea, setSelectedArea] = useState(null);
-    const [isDatePickerVisible, setDatePickerVisible] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(null);
+    const { fare, scannedData, selectedDestination, selectedDate, selectedTime, passengerId } = route.params;
+
+   
     const [objectId, setObjectId] = useState("");
     const [userData, setUserData] = useState({});
     const [errorMessage, setErrorMessage] = useState("");
@@ -78,25 +76,74 @@ const Payment = ({ navigation, route }) => {
         }
     }, [objectId]);
 
-    const showDatePicker = () => {
-        setDatePickerVisible(true);
+    const updateCost = async () => {
+        try {
+          const newCost = userData.balance - fare;
+          const response = await fetch(`https://sripass.onrender.com/api/localpassengers/${objectId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              balance: newCost,
+            }),
+          });
+      
+          if (response.ok) {
+            // The cost field has been successfully updated
+            console.log("Cost updated successfully");
+            // You might want to update the userData state with the new cost here if necessary
+            setUserData({ ...userData, cost: newCost });
+          } else {
+            console.error("Failed to update cost");
+          }
+        } catch (error) {
+          console.error("Error updating cost:", error);
+        }
+      };
+
+    const saveTravelHistory = async () => {
+        try {
+            const response = await fetch("https://sripass.onrender.com/api/travelhistory", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    PassengerID: passengerId,
+                    route: selectedDestination,
+                    routeNo: scannedData,
+                    date: selectedDate,
+                    time: selectedTime,
+                    cost: fare,
+                }),
+            });
+
+            if (response.ok) {
+                // Data was successfully saved, navigate to the "Book" page
+                navigation.navigate('Booking', { scannedData });
+            } else {
+                console.error("Failed to save travel history");
+            }
+        } catch (error) {
+            console.error("Error saving travel history:", error);
+        }
     };
 
-    const handleDateConfirm = (date) => {
-        const formattedDate = date.toISOString().split("T")[0];
-        setSelectedDate(formattedDate);
-        setDatePickerVisible(false);
-    };
 
     const handlePayment = () => {
         if (userData && userData.balance !== undefined && userData.balance >= fare) {
             // Sufficient balance, proceed with payment logic here
-            // ...
+            // Call the function to save travel history
+            saveTravelHistory();
+            updateCost();
+
         } else {
             setErrorMessage("Insufficient balance");
             setIsConfirmButtonDisabled(true);
         }
     };
+
 
 
     return (
@@ -113,7 +160,7 @@ const Payment = ({ navigation, route }) => {
                             marginTop: SIZES.padding * 6,
                             paddingHorizontal: SIZES.padding * 2,
                         }}
-                        onPress={() => navigation.navigate("Booking")}
+                        onPress={() => navigation.navigate('Booking', { scannedData })}
                     >
                         <Image
                             source={icons.back}
@@ -176,39 +223,35 @@ const Payment = ({ navigation, route }) => {
                         </View>
 
                         <View style={{ marginTop: SIZES.padding * 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={{ color: COLORS.black, fontSize: 16,  }}>Route</Text>
-                            <Text style={{ color: COLORS.darkgray, fontSize: 16,  }}>Panadura to Pettah</Text>
+                            <Text style={{ color: COLORS.black, fontSize: 16, }}>Route</Text>
+                            <Text style={{ color: COLORS.darkgray, fontSize: 16, }}>{selectedDestination}</Text>
                         </View>
 
                         <View style={{ marginTop: SIZES.padding * 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text style={{ color: COLORS.black, fontSize: 16 }}>Route No</Text>
-                            <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>101</Text>
+                            <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>{scannedData}</Text>
                         </View>
 
                         <View style={{ marginTop: SIZES.padding * 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text style={{ color: COLORS.black, fontSize: 16 }}>Date</Text>
-                            <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>2023-09-28</Text>
+                            <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>{selectedDate}</Text>
                         </View>
 
                         <View style={{ marginTop: SIZES.padding * 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text style={{ color: COLORS.black, fontSize: 16 }}>Time</Text>
-                            <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>11:19 PM</Text>
+                            <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>{selectedTime}</Text>
                         </View>
 
                         <View style={{ marginTop: SIZES.padding * 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text style={{ color: COLORS.black, fontSize: 16 }}>Cost</Text>
-                            <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>LKR 75</Text>
+                            <Text style={{ color: COLORS.darkgray, fontSize: 16 }}>LKR {fare}</Text>
                         </View>
 
-                        
+
 
                     </View>
-                    <View style={{ marginTop: SIZES.padding * 15, alignItems: 'center' }}>
-                            {errorMessage && (
-                                <Text style={{ color: COLORS.red, ...FONTS.body3 }}>{errorMessage}</Text>
-                            )}
-                        </View>
-                    <View style={{ margin: SIZES.padding * 3 }}>
+                    
+                    <View style={{ marginTop: SIZES.padding * 10, margin: SIZES.padding * 3 }}>
                         <TouchableOpacity
                             style={{
                                 height: 60,
@@ -222,18 +265,15 @@ const Payment = ({ navigation, route }) => {
                         >
                             <Text style={{ color: COLORS.white, ...FONTS.h3 }}>Confirm Payment</Text>
                         </TouchableOpacity>
-                       
+                        <View style={{ marginTop: SIZES.padding * 2, alignItems: 'center' }}>
+                        {errorMessage && (
+                            <Text style={{ color: COLORS.red, ...FONTS.body3 }}>{errorMessage}</Text>
+                        )}
+                    </View>
 
                     </View>
                 </ScrollView>
             </LinearGradient>
-            <DateTimePickerModal
-                isVisible={isDatePickerVisible}
-                mode="date"
-                display="spinner"
-                onConfirm={handleDateConfirm}
-                onCancel={() => setDatePickerVisible(false)}
-            />
         </KeyboardAvoidingView>
     );
 };
