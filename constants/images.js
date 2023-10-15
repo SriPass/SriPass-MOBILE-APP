@@ -12,6 +12,5 @@ export default {
     subBanner,
     focus,
     avatar,
-    check,
-    
+    check
 }
