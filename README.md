@@ -1,13 +1,13 @@
 <h1 align="center">SriPass - Your Ultimate Public Transport Management System</h1>
 <p align="center">
-  <img src="https://github.com/SriPass/SriPass-WEB-APP/blob/dev/logov2.png" alt="SriPass Logo" />
+  <img src="https://github.com/SriPass/SriPass-MOBILE-APP/blob/dev/assets/images/logov2.png" alt="SriPass Logo" />
 </p>
 
 <p align="center">
   🚌📊🛠️👮🧑‍✈️💰🔍
 </p>
 
-<h2 align="center">Welcome to SriPass!</h2>
+<h2 align="center">Welcome to SriPass - Mobile App!</h2>
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
@@ -33,10 +33,10 @@ Welcome to SriPass, the all-in-one solution for your public transport needs. Whe
 
 SriPass is the brainchild of these talented individuals:
 
-- [Darshi Bushhini](https://github.com/darshibushhini)
+- [Darshi Buddhini](https://github.com/darshibuddhini)
 - [Imesh Pasinda](https://github.com/imeshpasinda)
-- [Kimuthu Gamage](https://github.com/kimuthugamage)
-- [Dinithi Mendis](https://github.com/dinithimendis)
+- [Kimuthu Gamage](https://github.com/kimuthuug)
+- [Dinithi Mendis](https://github.com/dinithi27)
 
 ## Get Involved 🚀
 
