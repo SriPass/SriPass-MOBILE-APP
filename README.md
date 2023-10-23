@@ -26,8 +26,8 @@ Welcome to SriPass, the all-in-one solution for your public transport needs. Whe
 ## Technologies Used 🛠️
 
 - **Frontend:** React Native
-- **Backend:** Deployed on [Render.com](https://render.com)
-- **Web App URL:** [SriPass Web Application](https://sripass.onrender.com/)
+- **Backend:** Deployed on [Render.com] [SriPass Backend Application](https://sripass.onrender.com/)
+- **Web Appication GitHub Repo URL:** [SriPass Backend Application](https://github.com/SriPass/SriPass-WEB-APP)
 
 ## Authors 👩‍💻👨‍💻
 
@@ -42,11 +42,11 @@ SriPass is the brainchild of these talented individuals:
 
 We welcome contributors to help make SriPass even better! You can get involved by:
 
-1. Forking the repository.
-2. Creating your feature branch: `git checkout -b feature/your-feature`.
-3. Commit your changes: `git commit -m 'Add your feature'`.
-4. Push to the branch: `git push origin feature/your-feature`.
-5. Submit a pull request.
+- For the Run App (ReactNative application):
+  ```
+  npm expo
+  npm start
+  ```
 
 ## Feedback 💌
 
