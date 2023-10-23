@@ -27,9 +27,9 @@ Welcome to SriPass, the all-in-one solution for your public transport needs. Whe
 
 - **Frontend:** React Native
 - **Backend:** Deployed on [Render.com] [SriPass Backend Application](https://sripass.onrender.com/)
-- **Web Application GitHub Repo URL:** [SriPass Frontend Application](https://github.com/SriPass/SriPass-WEB-APP)
+- **Web Application GitHub Repo** [SriPass Frontend Application](https://github.com/SriPass/SriPass-WEB-APP)
 
-## Authors 👩‍💻👨‍💻
+## Authors 👩‍💻
 
 SriPass is the brainchild of these talented individuals:
 
