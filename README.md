@@ -42,7 +42,8 @@ SriPass is the brainchild of these talented individuals:
 
 We welcome contributors to help make SriPass even better! You can get involved by:
 
-- For the Run App (ReactNative application):
+- For the Run App (ReactNative Application):
+  
   ```
   npm expo
   npm start
