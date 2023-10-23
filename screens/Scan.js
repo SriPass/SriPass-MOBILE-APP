@@ -22,7 +22,7 @@ const Scan = ({ navigation }) => {
 
   const playScanSound = async () => {
     const { sound } = await Audio.Sound.createAsync(
-      require('../assets/sounds/qr_audio.mp3') // Replace with the path to your audio file
+      require('../assets/sounds/scan_sound.mp3') // Replace with the path to your audio file
     );
 
     await sound.playAsync();

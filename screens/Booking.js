@@ -13,7 +13,7 @@ import {
 
 import { LinearGradient } from "expo-linear-gradient";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COLORS, SIZES, FONTS, icons, images } from "../constants";
 
 const Booking = ({ navigation, route }) => {
@@ -28,14 +28,29 @@ const Booking = ({ navigation, route }) => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [isTimePickerVisible, setTimePickerVisible] = useState(false);
     const [selectedTime, setSelectedTime] = useState(null);
-
     const [routeNumbers, setRouteNumbers] = useState([]);
     const [selectedRoute, setSelectedRoute] = useState('');
 
     const [destinations, setDestinations] = useState([]);
     const [selectedDestination, setSelectedDestination] = useState('');
     const [fare, setFare] = useState('');
+    const [passengerId, setPassengerId] = useState("");
 
+    useEffect(() => {
+
+        const fetchPassengerId = async () => {
+            try {
+                const id = await AsyncStorage.getItem("passengerId");
+                if (id) {
+                    setPassengerId(id);
+                }
+            } catch (error) {
+                console.error("Error fetching user passengerId:", error);
+            }
+        };
+
+        fetchPassengerId();
+    }, []);
 
 
     useEffect(() => {
@@ -53,7 +68,7 @@ const Booking = ({ navigation, route }) => {
                         const destinationOptions = data.map((item) => ({
                             label: `${item.startPoint} - ${item.endPoint}`,
                             value: `${item.startPoint} - ${item.endPoint}`,
-                            fare: `LKR ${item.fare}` // Include the fare in the destination options
+                            fare: item.fare // Include the fare in the destination options
                         }));
                         setDestinations(destinationOptions);
 
@@ -94,29 +109,6 @@ const Booking = ({ navigation, route }) => {
     }, []);
 
 
-    useEffect(() => {
-        fetch("https://restcountries.com/v3.1/all?fields=name,flags,cca3,idd")
-            .then((response) => response.json())
-            .then((data) => {
-                let areaData = data.map((item) => {
-                    return {
-                        code: item.cca3,
-                        name: item.name?.common,
-                        flag: item.flags.png,
-                        callingCode: item.idd?.root + item.idd?.suffixes[0],
-                    };
-                });
-                setAreas(areaData);
-
-                if (areaData.length > 0) {
-                    let defaultData = areaData.filter((a) => a.code == "US");
-
-                    if (defaultData.length > 0) {
-                        setSelectedArea(defaultData[0]);
-                    }
-                }
-            });
-    }, []);
 
     const showDatePicker = () => {
         setDatePickerVisible(true);
@@ -176,7 +168,9 @@ const Booking = ({ navigation, route }) => {
                     marginTop: SIZES.padding * 2,
                     marginHorizontal: SIZES.padding * 3,
                 }}
+
             >
+
                 {/* Route Dropdown */}
                 <View
                     style={{
@@ -263,11 +257,11 @@ const Booking = ({ navigation, route }) => {
                         placeholder="Price"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
-                        value={fare}
-                        editable={false}
-                        onChangeText={(value) => setFare(value)} // Add this to handle changes to the Price TextInput
+                        value={fare ? `LKR ${fare}` : ''} // Display "LKR" before the price if fare is available
+                        editable={false} // Make the input non-editable
                     />
                 </View>
+
 
 
 
@@ -347,23 +341,35 @@ const Booking = ({ navigation, route }) => {
     };
 
     const renderButton = () => {
+        const isFormIncomplete = !selectedDestination || !selectedDate || !selectedTime || !fare;
+
         return (
             <View style={{ margin: SIZES.padding * 3 }}>
                 <TouchableOpacity
                     style={{
                         height: 60,
-                        backgroundColor: COLORS.lightblue,
+                        backgroundColor: isFormIncomplete ? COLORS.gray : COLORS.lightblue,
                         borderRadius: SIZES.radius / 1.5,
                         alignItems: "center",
                         justifyContent: "center",
                     }}
-                    onPress={() => navigation.navigate("HomeTabs")}
+                    onPress={() => {
+                        if (!isFormIncomplete) {
+                            // Pass the 'fare' as a parameter to the Payment page
+                            navigation.navigate("Payment", { fare, scannedData, selectedDestination, selectedDate, selectedTime, passengerId });
+                        }
+                    }}
+                    disabled={isFormIncomplete}
                 >
-                    <Text style={{ color: COLORS.white, ...FONTS.h3 }}>Book Now</Text>
+                    <Text style={{ color: isFormIncomplete ? COLORS.white : COLORS.white, ...FONTS.h3 }}>
+                        Book Now
+                    </Text>
                 </TouchableOpacity>
             </View>
         );
     };
+
+
 
 
     return (

@@ -12,7 +12,7 @@ import {
 
 import { LinearGradient } from "expo-linear-gradient";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COLORS, SIZES, FONTS, icons, images } from "../constants";
 
 const Profile = ({ navigation }) => {
@@ -22,32 +22,49 @@ const Profile = ({ navigation }) => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [isTimePickerVisible, setTimePickerVisible] = useState(false);
     const [selectedTime, setSelectedTime] = useState(null);
+    const [objectId, setObjectId] = useState("");
+    const [showPassword, setShowPassword] = React.useState(false)
 
-
+    const [userData, setUserData] = useState({});
 
     useEffect(() => {
-        fetch("https://restcountries.com/v3.1/all?fields=name,flags,cca3,idd")
-            .then((response) => response.json())
-            .then((data) => {
-                let areaData = data.map((item) => {
-                    return {
-                        code: item.cca3,
-                        name: item.name?.common,
-                        flag: item.flags.png,
-                        callingCode: item.idd?.root + item.idd?.suffixes[0],
-                    };
-                });
-                setAreas(areaData);
 
-                if (areaData.length > 0) {
-                    let defaultData = areaData.filter((a) => a.code == "US");
-
-                    if (defaultData.length > 0) {
-                        setSelectedArea(defaultData[0]);
-                    }
+        const fetchObjectId = async () => {
+            try {
+                const id = await AsyncStorage.getItem("objectId");
+                if (id) {
+                    setObjectId(id);
                 }
-            });
+            } catch (error) {
+                console.error("Error fetching user objectId:", error);
+            }
+        };
+
+        fetchObjectId();
     }, []);
+
+    useEffect(() => {
+        // Fetch user data based on the objectId using another useEffect
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch(`https://sripass.onrender.com/api/localpassengers/${objectId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    // Update the userData state with the fetched data
+                    setUserData(data);
+                } else {
+                    console.error("Failed to fetch user data");
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        if (objectId) {
+            fetchUserData();
+        }
+    }, [objectId]);
+
 
     const showDatePicker = () => {
         setDatePickerVisible(true);
@@ -108,8 +125,36 @@ const Profile = ({ navigation }) => {
                     marginHorizontal: SIZES.padding * 3,
                 }}
             >
-                {/* Route */}
-                <View style={{ marginTop: SIZES.padding * 3 }}>
+                {/* Display user data or loading text for the Name */}
+                <View style={{
+                    marginTop: SIZES.padding * 3,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                }}>
+                    <Text style={{
+                        ...FONTS.h2,
+                        color: COLORS.black,
+                        marginRight: 10
+                    }}>
+                        {userData && Object.keys(userData).length > 0
+                            ? `${userData.firstName} ${userData.lastName}`
+                            : "Loading..."}
+                    </Text>
+                    {userData && Object.keys(userData).length > 0 ? (
+                        <Image
+                            source={images.avatar}
+                            style={{
+                                width: 80,
+                                height: 80,
+                            }}
+                        />
+                    ) : null}
+                </View>
+
+
+                {/* Display user data or loading text for the Email */}
+                <View style={{ marginTop: SIZES.padding * 5 }}>
                     <TextInput
                         style={{
                             marginVertical: SIZES.padding,
@@ -123,83 +168,17 @@ const Profile = ({ navigation }) => {
                             paddingRight: 10,
                             ...FONTS.body3,
                         }}
-                        placeholder="Route"
+                        placeholder="Username"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
+                        value={userData && Object.keys(userData).length > 0
+                            ? userData.email
+                            : "Loading..."}
+                        editable={false}
                     />
                 </View>
 
-                {/* Date */}
-                <View style={{ marginTop: SIZES.padding * 1, flexDirection: "row", alignItems: "center" }}>
-                    <TextInput
-                        style={{
-                            flex: 1,
-                            marginVertical: SIZES.padding,
-                            borderRadius: 10,
-                            borderColor: COLORS.gray,
-                            borderWidth: 1,
-                            height: 55,
-                            backgroundColor: COLORS.lightGray,
-                            color: COLORS.black,
-                            paddingLeft: 10,
-                            paddingRight: 40, // Adjust the paddingRight to make space for the icon
-                            ...FONTS.body3,
-                        }}
-                        placeholder="Date"
-                        placeholderTextColor={COLORS.gray}
-                        selectionColor={COLORS.white}
-                        value={selectedDate} // Display the selected date here
-                        onTouchStart={showDatePicker} // Open the date picker on press
-                    />
-                    <TouchableOpacity onPress={showDatePicker} style={{ position: "absolute", right: 10 }}>
-                        <Image
-                            source={icons.calendar}
-                            style={{
-                                width: 20,
-                                height: 20,
-                                tintColor: COLORS.gray,
-                            }}
-                        />
-                    </TouchableOpacity>
-                </View>
-
-
-                {/* Time */}
-                <View style={{ marginTop: SIZES.padding * 1, flexDirection: "row", alignItems: "center" }}>
-                    <TextInput
-                        style={{
-                            flex: 1,
-                            marginVertical: SIZES.padding,
-                            borderRadius: 10,
-                            borderColor: COLORS.gray,
-                            borderWidth: 1,
-                            height: 55,
-                            backgroundColor: COLORS.lightGray,
-                            color: COLORS.black,
-                            paddingLeft: 10,
-                            paddingRight: 40, // Adjust the paddingRight to make space for the icon
-                            ...FONTS.body3,
-                        }}
-                        placeholder="Time"
-                        placeholderTextColor={COLORS.gray}
-                        selectionColor={COLORS.white}
-                        value={selectedTime} // Display the selected time here
-                        onTouchStart={showTimePicker} // Open the time picker on press
-                    />
-                    <TouchableOpacity onPress={showTimePicker} style={{ position: "absolute", right: 10 }}>
-                        <Image
-                            source={icons.clock}
-                            style={{
-                                width: 20,
-                                height: 20,
-                                tintColor: COLORS.gray,
-                            }}
-                        />
-                    </TouchableOpacity>
-                </View>
-
-
-                {/* No of Seats */}
+                {/* Display user data or loading text for the Username */}
                 <View style={{ marginTop: SIZES.padding * 1 }}>
                     <TextInput
                         style={{
@@ -214,13 +193,17 @@ const Profile = ({ navigation }) => {
                             paddingRight: 10,
                             ...FONTS.body3,
                         }}
-                        placeholder="No of Seats"
+                        placeholder="Username"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
+                        value={userData && Object.keys(userData).length > 0
+                            ? `${userData.firstName}_${userData.lastName}`.toLowerCase()
+                            : "Loading..."}
+                        editable={false}
                     />
                 </View>
 
-                {/* Price */}
+                {/* Display user data or loading text for the Password */}
                 <View style={{ marginTop: SIZES.padding * 1 }}>
                     <TextInput
                         style={{
@@ -235,10 +218,36 @@ const Profile = ({ navigation }) => {
                             paddingRight: 10,
                             ...FONTS.body3,
                         }}
-                        placeholder="Price"
+                        placeholder="Password"
                         placeholderTextColor={COLORS.gray}
                         selectionColor={COLORS.white}
+                        value={userData && Object.keys(userData).length > 0
+                            ? userData.password
+                            : "Loading..."}
+                        secureTextEntry={!showPassword}
+                        editable={false}
                     />
+                    {userData && Object.keys(userData).length > 0 ? (
+                        <TouchableOpacity
+                            style={{
+                                position: "absolute",
+                                right: 0,
+                                bottom: 15,
+                                height: 30,
+                                width: 30,
+                            }}
+                            onPress={() => setShowPassword(!showPassword)}
+                        >
+                            <Image
+                                source={showPassword ? icons.disable_eye : icons.eye}
+                                style={{
+                                    height: 20,
+                                    width: 20,
+                                    tintColor: COLORS.gray,
+                                }}
+                            />
+                        </TouchableOpacity>
+                    ) : null}
                 </View>
             </View>
         );
@@ -265,7 +274,7 @@ const Profile = ({ navigation }) => {
             </View>
         );
     };
-    
+
 
 
     return (

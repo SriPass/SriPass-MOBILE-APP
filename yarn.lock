@@ -1930,15 +1930,15 @@
     "react-is" "^16.13.0"
     "use-latest-callback" "^0.1.5"
 
-"@react-navigation/elements@^1.3.18":
-  "integrity" "sha512-/0hwnJkrr415yP0Hf4PjUKgGyfshrvNUKFXN85Mrt1gY49hy9IwxZgrrxlh0THXkPeq8q4VWw44eHDfAcQf20Q=="
-  "resolved" "https://registry.npmjs.org/@react-navigation/elements/-/elements-1.3.18.tgz"
-  "version" "1.3.18"
+"@react-navigation/elements@^1.3.18", "@react-navigation/elements@^1.3.19":
+  "integrity" "sha512-7hLvSYKPuDS070pza5gd43WDX7QgfuEmuTWNbCJhKdWlLudYmq3qzxGCBwCfO2dEI6+p8tla5wruaWiGKAbTYw=="
+  "resolved" "https://registry.npmjs.org/@react-navigation/elements/-/elements-1.3.19.tgz"
+  "version" "1.3.19"
 
-"@react-navigation/native@^6.0.0", "@react-navigation/native@^6.1.7":
-  "integrity" "sha512-W6E3+AtTombMucCRo6q7vPmluq8hSjS+IxfazJ/SokOe7ChJX7eLvvralIsJkjFj3iWV1KgOSnHxa6hdiFasBw=="
-  "resolved" "https://registry.npmjs.org/@react-navigation/native/-/native-6.1.7.tgz"
-  "version" "6.1.7"
+"@react-navigation/native@^6.0.0", "@react-navigation/native@^6.1.8":
+  "integrity" "sha512-0alti852nV+8oCVm9H80G6kZvrHoy51+rXBvVCRUs2rNDDozC/xPZs8tyeCJkqdw3cpxZDK8ndXF22uWq28+0Q=="
+  "resolved" "https://registry.npmjs.org/@react-navigation/native/-/native-6.1.8.tgz"
+  "version" "6.1.8"
   dependencies:
     "@react-navigation/core" "^6.4.9"
     "escape-string-regexp" "^4.0.0"
@@ -1952,12 +1952,12 @@
   dependencies:
     "nanoid" "^3.1.23"
 
-"@react-navigation/stack@^6.3.17":
-  "integrity" "sha512-8/8ZvJROK3fp6PRmQ9MrXd9epBowA8NkfCaWW/N9H5arqwNX9lTXAkmcjicRhjpX+UNlMBR9dTLkWvPRe2vY9A=="
-  "resolved" "https://registry.npmjs.org/@react-navigation/stack/-/stack-6.3.17.tgz"
-  "version" "6.3.17"
+"@react-navigation/stack@^6.3.18":
+  "integrity" "sha512-jAXneaLAs57xvyMFkebEyGCZDyz90KnaN7fM9f5Bu+Gx3KnoppdNfT4drpmN/f5f32L0eXS4aRAvuDrFT1mFfw=="
+  "resolved" "https://registry.npmjs.org/@react-navigation/stack/-/stack-6.3.18.tgz"
+  "version" "6.3.18"
   dependencies:
-    "@react-navigation/elements" "^1.3.18"
+    "@react-navigation/elements" "^1.3.19"
     "color" "^4.2.3"
     "warn-once" "^0.1.0"
 

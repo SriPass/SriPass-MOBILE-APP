@@ -86,12 +86,12 @@ const History = ({ navigation }) => {
           <View key={index}>
             {/* Display route and createdAt in the same row */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ color: COLORS.black, fontSize: 18, fontWeight: 'bold', paddingBottom: 5 }}>{item.journey}</Text>
-              <Text style={{ color: COLORS.gray, fontSize: 16, paddingBottom: 2 }}>{item.createdAt.split('T')[0]}</Text>
+              <Text style={{ color: COLORS.black, fontSize: 18, fontWeight: 'bold', paddingBottom: 5 }}>{item.route}</Text>
+              <Text style={{ color: COLORS.gray, fontSize: 16, paddingBottom: 2 }}>{item.date}</Text>
             </View>
             
-            <Text style={{ color: COLORS.black, fontSize: 16, paddingBottom: 2 }}>Duration: {item.duration} min</Text>
-            <Text style={{ color: COLORS.black, fontSize: 16, paddingBottom: 2 }}>Distance: {item.distance} Km</Text>
+            <Text style={{ color: COLORS.black, fontSize: 16, paddingBottom: 2 }}>Route No: {item.routeNo}</Text>
+            <Text style={{ color: COLORS.black, fontSize: 16, paddingBottom: 2 }}>Time: {item.time}</Text>
             <Text style={{ color: COLORS.black, fontSize: 16 }}>Cost: LKR {item.cost}</Text>
     
             {index !== historyData.length - 1 && ( // Add a divider if not the last item

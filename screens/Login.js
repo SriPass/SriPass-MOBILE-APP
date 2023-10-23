@@ -48,6 +48,7 @@ const Login = ({ navigation }) => {
                 await AsyncStorage.setItem("userEmail", user.email);
                 await AsyncStorage.setItem("userName", user.name);
                 await AsyncStorage.setItem("passengerId", user.passengerId);
+                await AsyncStorage.setItem("objectId", user.id);
                 // Navigate to the Home screen
                 navigation.navigate("HomeTabs");
             } else {
